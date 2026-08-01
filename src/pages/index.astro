@@ -102,22 +102,33 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
           />
         </div>
 
-        <!-- Field 4: Detail Tes (Radio Button) -->
-        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3 pt-1">
-          <label class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-0.5">
-            DETAIL TES <span class="text-red-500">*</span>
-          </label>
-          <div class="space-y-2.5 text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569]">
-            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-              <input type="radio" name="detailTes" value="LULUS" required class="w-4 h-4 text-[#10b981] accent-[#10b981] focus:ring-0 cursor-pointer" />
-              <span class="group-hover:text-[#1e293b] transition-colors">LULUS</span>
-            </label>
-            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-              <input type="radio" name="detailTes" value="MENGULANG LAGI" class="w-4 h-4 text-[#10b981] accent-[#10b981] focus:ring-0 cursor-pointer" />
-              <span class="group-hover:text-[#1e293b] transition-colors">MENGULANG LAGI</span>
-            </label>
-          </div>
-        </div>
+<!-- Field 4: Detail Tes (Tombol Opsi) -->
+<div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3 pt-1">
+  <label class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-1">
+    DETAIL TES <span class="text-red-500">*</span>
+  </label>
+  
+  <!-- Container Tombol (Sebaris) -->
+  <div class="flex items-center gap-3 w-full">
+    
+    <!-- Tombol LULUS (Hijau -> Abu-abu saat dipilih) -->
+    <label class="flex-1 cursor-pointer">
+      <input type="radio" name="detailTes" value="LULUS" required class="peer hidden" />
+      <span class="flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 peer-checked:bg-slate-500 peer-checked:shadow-inner text-center select-none">
+        LULUS
+      </span>
+    </label>
+
+    <!-- Tombol MENGULANG LAGI (Merah -> Abu-abu saat dipilih) -->
+    <label class="flex-1 cursor-pointer">
+      <input type="radio" name="detailTes" value="MENGULANG LAGI" class="peer hidden" />
+      <span class="flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 peer-checked:bg-slate-500 peer-checked:shadow-inner text-center select-none">
+        MENGULANG LAGI
+      </span>
+    </label>
+
+  </div>
+</div>
 
         <!-- Field 5: Catatan (Textarea) -->
         <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3">
