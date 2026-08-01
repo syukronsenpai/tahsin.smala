@@ -1,0 +1,322 @@
+---
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+
+const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%2Fheader3.68b41cf66effe4.06405900.png?md5=1hOLhSd5OQUJQBlLbNZ9bA&expires=1785511403";
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulir Tes Kenaikan Jilid</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#f3f4f8] min-h-screen py-8 sm:py-12 px-4 flex justify-center items-start font-['Inter',sans-serif] antialiased text-[#2c3e50] tracking-normal">
+    
+    <!-- Container Card Utama -->
+    <main class="w-full max-w-[680px] bg-white rounded-md shadow-sm border border-[#e2e8f0] overflow-hidden">
+      
+      <!-- Header Banner Image -->
+      <div class="w-full bg-slate-50 border-b border-[#e2e8f0] overflow-hidden">
+        <Image 
+          src={headerImageUrl} 
+          alt="Header Formulir Tes Kenaikan Jilid" 
+          width={680}
+          height={180}
+          loading="eager"
+          decoding="async"
+          class="w-full h-auto object-cover block"
+        />
+      </div>
+
+      <!-- Form Content -->
+      <form id="testForm" class="p-6 sm:p-9 space-y-6">
+        
+        <!-- Field 1: Nama Siswa (Custom Search Dropdown Pas Di Bawah Input) -->
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-center gap-2 sm:gap-3">
+          <label for="namaSiswa" class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569]">
+            NAMA SISWA <span class="text-red-500">*</span>
+          </label>
+          
+          <!-- Wrapper dengan relative positioning -->
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="namaSiswa" 
+              placeholder="KETIK NAMA SISWA"
+              required
+              autocomplete="off"
+              class="w-full px-3.5 py-2 text-[13px] tracking-[0.04em] font-medium border border-[#cbd5e1] rounded-[3px] focus:outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] text-[#1e293b] uppercase placeholder:tracking-normal placeholder:normal-case placeholder:font-normal placeholder:text-slate-400 transition-all"
+            />
+            
+            <!-- Custom Dropdown Container -->
+            <div 
+              id="customDropdown" 
+              class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-[#cbd5e1] rounded-[3px] shadow-lg max-h-52 overflow-y-auto divide-y divide-slate-100"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Field 2: Kelas (Read-only otomatis) -->
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-center gap-2 sm:gap-3">
+          <label for="kelas" class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569]">
+            KELAS
+          </label>
+          <input 
+            type="text" 
+            id="kelas" 
+            readonly 
+            placeholder="Otomatis terisi"
+            class="w-full px-3.5 py-2 text-[13px] tracking-[0.05em] font-semibold border border-[#cbd5e1] rounded-[3px] bg-[#f8fafc] text-[#334155] uppercase cursor-not-allowed focus:outline-none placeholder:normal-case placeholder:tracking-normal placeholder:font-normal placeholder:text-slate-400"
+          />
+        </div>
+
+        <!-- Field 3: Jilid Saat Ini (Read-only otomatis) -->
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-center gap-2 sm:gap-3">
+          <label for="jilid" class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569]">
+            JILID SAAT INI
+          </label>
+          <input 
+            type="text" 
+            id="jilid" 
+            readonly 
+            placeholder="Otomatis terisi"
+            class="w-full px-3.5 py-2 text-[13px] tracking-[0.05em] font-semibold border border-[#cbd5e1] rounded-[3px] bg-[#f8fafc] text-[#334155] uppercase cursor-not-allowed focus:outline-none placeholder:normal-case placeholder:tracking-normal placeholder:font-normal placeholder:text-slate-400"
+          />
+        </div>
+
+        <!-- Field 4: Detail Tes (Radio Button) -->
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3 pt-1">
+          <label class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-0.5">
+            DETAIL TES <span class="text-red-500">*</span>
+          </label>
+          <div class="space-y-2.5 text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569]">
+            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+              <input type="radio" name="detailTes" value="LULUS" required class="w-4 h-4 text-[#10b981] accent-[#10b981] focus:ring-0 cursor-pointer" />
+              <span class="group-hover:text-[#1e293b] transition-colors">LULUS</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+              <input type="radio" name="detailTes" value="MENGULANG LAGI" class="w-4 h-4 text-[#10b981] accent-[#10b981] focus:ring-0 cursor-pointer" />
+              <span class="group-hover:text-[#1e293b] transition-colors">MENGULANG LAGI</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Field 5: Catatan (Textarea) -->
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3">
+          <label for="catatan" class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-2">
+            CATATAN
+          </label>
+          <textarea 
+            id="catatan" 
+            rows="4" 
+            placeholder="Masukkan catatan penilaian..."
+            class="w-full px-3.5 py-2.5 text-[13px] leading-relaxed tracking-[0.02em] border border-[#cbd5e1] rounded-[3px] focus:outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] text-[#1e293b] resize-y placeholder:text-slate-400 placeholder:tracking-normal transition-all"
+          ></textarea>
+        </div>
+
+        <!-- Footer & Submit Button -->
+        <div class="border-t border-[#f1f5f9] pt-6 mt-8 flex justify-center">
+          <button 
+            type="submit" 
+            class="bg-[#10b981] hover:bg-[#059669] active:bg-[#047857] text-white font-bold text-[13px] tracking-[0.06em] uppercase px-12 py-2.5 rounded-[3px] transition-all duration-150 shadow-sm cursor-pointer"
+          >
+            Submit
+          </button>
+        </div>
+
+      </form>
+
+<!-- Pesan Sukses (Sembunyi secara default) -->
+<div id="suksesContainer" class="hidden p-6 sm:p-9 text-center space-y-4">
+  <h2 class="text-xl font-bold text-emerald-600">
+    ✅ Data berhasil disimpan!
+  </h2>
+  
+  <!-- Tombol utama: "Tes Anak Berikutnya" (Fungsional, ramah klik) -->
+  <button 
+    onclick="location.reload()" 
+    class="bg-[#10b981] hover:bg-[#059669] active:bg-[#047857] text-white font-bold text-[13px] tracking-[0.06em] uppercase px-12 py-2.5 rounded-[3px] transition-all duration-150 shadow-sm cursor-pointer"
+  >
+    Tes Anak Berikutnya
+  </button>
+</div>
+
+    </main>
+
+    <!-- Client-side Logic (Custom Search Dropdown & SheetDB Cache) -->
+    <script is:inline>
+      const SHEETDB_API_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=API-form";
+
+      let dataSiswa = [];
+
+      const inputNama = document.getElementById('namaSiswa');
+      const customDropdown = document.getElementById('customDropdown');
+      const inputKelas = document.getElementById('kelas');
+      const inputJilid = document.getElementById('jilid');
+      const form = document.getElementById('testForm');
+
+      // 1. Ambil Data dari SheetDB / Local Cache
+      async function fetchSiswa() {
+        const cachedData = localStorage.getItem('cache_sheetdb_apiform');
+        if (cachedData) {
+          try {
+            dataSiswa = JSON.parse(cachedData);
+          } catch (e) {
+            console.error("Gagal membaca cache:", e);
+          }
+        }
+
+        try {
+          const response = await fetch(SHEETDB_API_URL);
+          if (!response.ok) return;
+
+          const resJson = await response.json();
+          if (Array.isArray(resJson)) {
+            dataSiswa = resJson;
+            localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
+          }
+        } catch (error) {
+          console.error("Gagal koneksi SheetDB:", error);
+        }
+      }
+
+      // 2. Render Custom Dropdown (Pas di bawah input & Highlight huruf)
+      function renderDropdown(query = '') {
+        if (!customDropdown) return;
+        const val = query.trim().toUpperCase();
+
+        if (!val) {
+          customDropdown.classList.add('hidden');
+          return;
+        }
+
+        // Filter nama siswa berdasarkan yang diketik
+        const filtered = dataSiswa.filter(s => 
+          s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
+        );
+
+        if (filtered.length === 0) {
+          customDropdown.classList.add('hidden');
+          return;
+        }
+
+        customDropdown.innerHTML = '';
+        
+        filtered.forEach(siswa => {
+          const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
+          const item = document.createElement('div');
+          
+          item.className = "px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
+
+          // Highlight karakter yang cocok saat diketik
+          const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+          item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
+
+          // Action saat nama di-klik
+          item.addEventListener('click', () => {
+            inputNama.value = namaLengkap;
+            inputKelas.value = siswa["Kelas"] || "";
+            inputJilid.value = siswa["Saat Ini"] || "";
+            customDropdown.classList.add('hidden');
+          });
+
+          customDropdown.appendChild(item);
+        });
+
+        customDropdown.classList.remove('hidden');
+      }
+
+      // 3. Event Listeners Input
+      inputNama?.addEventListener('input', (e) => {
+        const val = e.target.value;
+        renderDropdown(val);
+
+        // Reset auto-fill jika input dibersihkan
+        if (!val) {
+          inputKelas.value = "";
+          inputJilid.value = "";
+        }
+      });
+
+      // Tampilkan pilihan saat fokus jika sudah ada ketikan
+      inputNama?.addEventListener('focus', (e) => {
+        if (e.target.value) renderDropdown(e.target.value);
+      });
+
+      // Sembunyikan dropdown jika klik di luar area input
+      document.addEventListener('click', (e) => {
+        if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
+          customDropdown?.classList.add('hidden');
+        }
+      });
+
+// Submit Handler Baru (Kirim Data ke Tab 'respons')
+      const SHEETDB_SUBMIT_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=respons";
+
+      function toProperCase(str) {
+        if (!str) return '';
+        return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
+          return a.toUpperCase();
+        });
+      }
+
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'MENGIRIM...';
+
+        const namaInput = inputNama.value;
+
+        const payload = {
+          "Submission Date": new Date().toLocaleString('id-ID'),
+          "Nama Siswa": namaInput,
+          "Kelas": inputKelas.value,
+          "Saat Ini": inputJilid.value,
+          "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
+          "Nama Proper": toProperCase(namaInput),
+          "Catatan": document.getElementById('catatan').value
+        };
+
+        try {
+          const response = await fetch(SHEETDB_SUBMIT_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ data: payload })
+          });
+
+          if (response.ok) {
+  // Sembunyikan form utama
+  document.getElementById('testForm').classList.add('hidden');
+  
+  // Tampilkan container pesan sukses
+  document.getElementById('suksesContainer').classList.remove('hidden');
+} else {
+  alert('❌ Gagal menyimpan data. Coba lagi!');
+}
+        } catch (error) {
+          console.error('Error Submit:', error);
+          alert('❌ Terjadi kesalahan koneksi.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalBtnText;
+        }
+      });
+
+      // Inisialisasi
+      fetchSiswa();
+    </script>
+  </body>
+</html>
