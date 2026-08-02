@@ -357,23 +357,39 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
   // B. Navigasi Keyboard (Tombol Panah Atas, Bawah, Enter, Escape)
   inputNama?.addEventListener('keydown', (e) => {
+    // 1. FITUR HAPUS INSTAN DENGAN 1x BACKSPACE
+    if (e.key === 'Backspace') {
+      if (inputNama.value.length > 0) {
+        e.preventDefault(); // Mencegah hapus per-huruf
+        
+        inputNama.value = "";  // Kosongkan nama
+        inputKelas.value = ""; // Kosongkan kelas
+        inputJilid.value = ""; // Kosongkan jilid
+        
+        customDropdown?.classList.add('hidden'); // Sembunyikan dropdown
+        selectedIndex = -1;
+        return;
+      }
+    }
+
+    // 2. NAVIGASI ARROW & ENTER
     if (customDropdown?.classList.contains('hidden')) return;
 
     const items = customDropdown?.querySelectorAll('.dropdown-item');
     if (!items || items.length === 0) return;
 
     if (e.key === 'ArrowDown') {
-      e.preventDefault(); // Mencegah kursor melompat
+      e.preventDefault();
       selectedIndex = (selectedIndex + 1) % items.length;
       updateHighlight(items);
     } else if (e.key === 'ArrowUp') {
-      e.preventDefault(); // Mencegah kursor melompat
+      e.preventDefault();
       selectedIndex = (selectedIndex - 1 + items.length) % items.length;
       updateHighlight(items);
     } else if (e.key === 'Enter') {
       if (selectedIndex > -1 && items[selectedIndex]) {
-        e.preventDefault(); // Mencegah form ter-submit otomatis
-        items[selectedIndex]._selectItem(); // Eksekusi pilihan
+        e.preventDefault();
+        items[selectedIndex]._selectItem();
       }
     } else if (e.key === 'Escape') {
       customDropdown?.classList.add('hidden');
