@@ -32,6 +32,11 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
 
   </head>
+  <!-- Splash Screen ditaruh di PALING ATAS di dalam <body> -->
+    <div id="splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
+      <div class="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+    </div>
+
   <body class="bg-[#f3f4f8] min-h-screen py-8 sm:py-12 px-4 flex justify-center items-start font-['Inter',sans-serif] antialiased text-[#2c3e50] tracking-normal">
     
     <!-- Container Card Utama -->
@@ -469,6 +474,18 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
   // 4. INISIALISASI (JALANKAN SAAT AWAL)
   // ==========================================
   fetchSiswa();
+
+  // ==========================================
+  // 5. SCRIPT SPLASH SCREEN (HILANGKAN SETELAH HALAMAN SIAP)
+  // ==========================================
+  window.addEventListener('DOMContentLoaded', () => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+          splash.classList.add('opacity-0', 'pointer-events-none');
+          setTimeout(() => splash.remove(), 500);
+        }
+      });
+
 </script>
   </body>
 </html>
