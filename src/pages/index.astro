@@ -189,175 +189,126 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
     <!-- Client-side Logic (Custom Search Dropdown & SheetDB Cache) -->
     <script is:inline>
-      const SHEETDB_API_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=API-form";
+  // ==========================================
+  // 1. KONFIGURASI & VARIABEL GLOBAL
+  // ==========================================
+  const SHEETDB_API_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=API-form";
+  const SHEETDB_SUBMIT_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=respons";
 
-      let dataSiswa = [];
+  let dataSiswa = [];
+  let selectedIndex = -1; // Melacak indeks item yang disorot panah keyboard
 
-      const inputNama = document.getElementById('namaSiswa');
-      const customDropdown = document.getElementById('customDropdown');
-      const inputKelas = document.getElementById('kelas');
-      const inputJilid = document.getElementById('jilid');
-      const form = document.getElementById('testForm');
+  // Mengambil elemen HTML berdasarkan ID
+  const inputNama = document.getElementById('namaSiswa');
+  const customDropdown = document.getElementById('customDropdown');
+  const inputKelas = document.getElementById('kelas');
+  const inputJilid = document.getElementById('jilid');
+  const form = document.getElementById('testForm');
 
-      // 1. Ambil Data dari SheetDB / Local Cache
-      async function fetchSiswa() {
-        const cachedData = localStorage.getItem('cache_sheetdb_apiform');
-        if (cachedData) {
-          try {
-            dataSiswa = JSON.parse(cachedData);
-          } catch (e) {
-            console.error("Gagal membaca cache:", e);
-          }
-        }
+  // ==========================================
+  // 2. FUNGSI-FUNGSI LOGIKA (UTILITY)
+  // ==========================================
 
-        try {
-          const response = await fetch(SHEETDB_API_URL);
-          if (!response.ok) return;
-
-          const resJson = await response.json();
-          if (Array.isArray(resJson)) {
-            dataSiswa = resJson;
-            localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
-          }
-        } catch (error) {
-          console.error("Gagal koneksi SheetDB:", error);
-        }
+  // A. Ambil Data dari SheetDB / Local Cache
+  async function fetchSiswa() {
+    const cachedData = localStorage.getItem('cache_sheetdb_apiform');
+    if (cachedData) {
+      try {
+        dataSiswa = JSON.parse(cachedData);
+      } catch (e) {
+        console.error("Gagal membaca cache:", e);
       }
+    }
 
-      // 2. Render Custom Dropdown (Pas di bawah input & Highlight huruf)
-      function renderDropdown(query = '') {
-        if (!customDropdown) return;
-        const val = query.trim().toUpperCase();
+    try {
+      const response = await fetch(SHEETDB_API_URL);
+      if (!response.ok) return;
 
-        if (!val) {
-          customDropdown.classList.add('hidden');
-          return;
-        }
-
-        // Filter nama siswa berdasarkan yang diketik
-        const filtered = dataSiswa.filter(s => 
-          s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
-        );
-
-        if (filtered.length === 0) {
-          customDropdown.classList.add('hidden');
-          return;
-        }
-
-        customDropdown.innerHTML = '';
-        
-        filtered.forEach(siswa => {
-          const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
-          const item = document.createElement('div');
-          
-          item.className = "px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
-
-          // Highlight karakter yang cocok saat diketik
-          const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-          item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
-
-          // Action saat nama di-klik
-          item.addEventListener('click', () => {
-            inputNama.value = namaLengkap;
-            inputKelas.value = siswa["Kelas"] || "";
-            inputJilid.value = siswa["Saat Ini"] || "";
-            customDropdown.classList.add('hidden');
-          });
-
-          customDropdown.appendChild(item);
-        });
-
-        customDropdown.classList.remove('hidden');
+      const resJson = await response.json();
+      if (Array.isArray(resJson)) {
+        dataSiswa = resJson;
+        localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
       }
+    } catch (error) {
+      console.error("Gagal koneksi SheetDB:", error);
+    }
+  }
 
-      // 3. Event Listeners Input
-      inputNama?.addEventListener('input', (e) => {
-        const val = e.target.value;
-        renderDropdown(val);
+  // B. Render Custom Dropdown
+  function renderDropdown(query = '') {
+    selectedIndex = -1; // Reset indeks setiap kali input diketik ulang
 
-        // Reset auto-fill jika input dibersihkan
-        if (!val) {
-          inputKelas.value = "";
-          inputJilid.value = "";
-        }
-      });
+    if (!customDropdown) return;
+    const val = query.trim().toUpperCase();
 
-      // Tampilkan pilihan saat fokus jika sudah ada ketikan
-      inputNama?.addEventListener('focus', (e) => {
-        if (e.target.value) renderDropdown(e.target.value);
-      });
+    if (!val) {
+      customDropdown.classList.add('hidden');
+      return;
+    }
 
-      // Sembunyikan dropdown jika klik di luar area input
-      document.addEventListener('click', (e) => {
-        if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
-          customDropdown?.classList.add('hidden');
-        }
-      });
+    // Filter nama siswa berdasarkan yang diketik
+    const filtered = dataSiswa.filter(s => 
+      s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
+    );
 
-// Submit Handler Baru (Kirim Data ke Tab 'respons')
-      const SHEETDB_SUBMIT_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=respons";
+    if (filtered.length === 0) {
+      customDropdown.classList.add('hidden');
+      return;
+    }
 
-      function toProperCase(str) {
-        if (!str) return '';
-        return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
-          return a.toUpperCase();
-        });
+    customDropdown.innerHTML = '';
+    
+    filtered.forEach(siswa => {
+      const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
+      const item = document.createElement('div');
+      
+      // Class 'dropdown-item' ditambahkan agar mudah ditarget oleh navigasi keyboard
+      item.className = "dropdown-item px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
+
+      // Highlight karakter yang cocok saat diketik
+      const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
+
+      // Action saat item dipilih (diklik atau di-enter)
+      const selectThisItem = () => {
+        inputNama.value = namaLengkap;
+        inputKelas.value = siswa["Kelas"] || "";
+        inputJilid.value = siswa["Saat Ini"] || "";
+        customDropdown.classList.add('hidden');
+        selectedIndex = -1;
+      };
+
+      item.addEventListener('click', selectThisItem);
+      item._selectItem = selectThisItem; // Simpan fungsi agar bisa dipanggil lewat tombol Enter
+
+      customDropdown.appendChild(item);
+    });
+
+    customDropdown.classList.remove('hidden');
+  }
+
+  // C. Update Tampilan Highlight Tombol Panah (Keyboard Navigation)
+  function updateHighlight(items) {
+    items.forEach((item, index) => {
+      if (index === selectedIndex) {
+        item.classList.add('bg-[#eff6ff]', 'text-[#2563eb]'); // Beri warna sorotan
+        item.scrollIntoView({ block: 'nearest' }); // Auto-scroll jika opsi panjang
+      } else {
+        item.classList.remove('bg-[#eff6ff]', 'text-[#2563eb]'); // Hapus warna sorotan
       }
+    });
+  }
 
-      form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  // D. Ubah teks menjadi Format Proper Case (Kapital di Awal Kata)
+  function toProperCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
+      return a.toUpperCase();
+    });
+  }
 
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerText;
-        
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'MENGIRIM...';
-
-        const namaInput = inputNama.value;
-
-        const payload = {
-          "Submission Date": new Date().toLocaleString('id-ID'),
-          "Nama Siswa": namaInput,
-          "Kelas": inputKelas.value,
-          "Saat Ini": inputJilid.value,
-          "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
-          "Nama Proper": toProperCase(namaInput),
-          "Catatan": document.getElementById('catatan').value
-        };
-
-        try {
-          const response = await fetch(SHEETDB_SUBMIT_URL, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ data: payload })
-          });
-
-          if (response.ok) {
-  // Sembunyikan form utama
-  document.getElementById('testForm').classList.add('hidden');
-  
-  // Tampilkan container pesan sukses
-  document.getElementById('suksesContainer').classList.remove('hidden');
-} else {
-  alert('❌ Gagal menyimpan data. Coba lagi!');
-}
-        } catch (error) {
-          console.error('Error Submit:', error);
-          alert('❌ Terjadi kesalahan koneksi.');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
-        }
-      });
-
-      // Inisialisasi
-      fetchSiswa();
-
- // Tampilkan tombol reset
-function selectOption(value) {
+  // E. Pilihan Kustom Tombol Radio (LULUS / MENGULANG)
+  function selectOption(value) {
     const radioLulus = document.getElementById('radio-lulus');
     const radioMengulang = document.getElementById('radio-mengulang');
     const optionContainer = document.getElementById('option-container');
@@ -365,33 +316,139 @@ function selectOption(value) {
     const selectedBtn = document.getElementById('selected-btn');
     const selectedText = document.getElementById('selected-text');
 
-    // 1. Set radio button yang tersembunyi
     if (value === 'LULUS') {
-      radioLulus.checked = true;
-      selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
+      if (radioLulus) radioLulus.checked = true;
+      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
     } else {
-      radioMengulang.checked = true;
-      selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
+      if (radioMengulang) radioMengulang.checked = true;
+      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
     }
 
-    selectedText.innerText = value;
-
-    // 2. Swapping Tampilan (Sembunyikan opsi awal, tampilkan 70:30)
-    optionContainer.classList.add('hidden');
-    selectedContainer.classList.remove('hidden');
+    if (selectedText) selectedText.innerText = value;
+    optionContainer?.classList.add('hidden');
+    selectedContainer?.classList.remove('hidden');
   }
 
   function resetOption() {
-    // 1. Uncheck radio buttons
-    document.getElementById('radio-lulus').checked = false;
-    document.getElementById('radio-mengulang').checked = false;
+    const radioLulus = document.getElementById('radio-lulus');
+    const radioMengulang = document.getElementById('radio-mengulang');
+    if (radioLulus) radioLulus.checked = false;
+    if (radioMengulang) radioMengulang.checked = false;
 
-    // 2. Kembalikan ke tampilan opsi awal
-    document.getElementById('option-container').classList.remove('hidden');
-    document.getElementById('selected-container').classList.add('hidden');
+    document.getElementById('option-container')?.classList.remove('hidden');
+    document.getElementById('selected-container')?.classList.add('hidden');
   }
 
+  // ==========================================
+  // 3. EVENT LISTENERS (AKSI PENGGUNA)
+  // ==========================================
 
-    </script>
+  // A. Saat Pengguna Ketik di Input Nama
+  inputNama?.addEventListener('input', (e) => {
+    const val = e.target.value;
+    renderDropdown(val);
+
+    // Reset auto-fill jika input dibersihkan
+    if (!val) {
+      inputKelas.value = "";
+      inputJilid.value = "";
+    }
+  });
+
+  // B. Navigasi Keyboard (Tombol Panah Atas, Bawah, Enter, Escape)
+  inputNama?.addEventListener('keydown', (e) => {
+    if (customDropdown?.classList.contains('hidden')) return;
+
+    const items = customDropdown?.querySelectorAll('.dropdown-item');
+    if (!items || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault(); // Mencegah kursor melompat
+      selectedIndex = (selectedIndex + 1) % items.length;
+      updateHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault(); // Mencegah kursor melompat
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      updateHighlight(items);
+    } else if (e.key === 'Enter') {
+      if (selectedIndex > -1 && items[selectedIndex]) {
+        e.preventDefault(); // Mencegah form ter-submit otomatis
+        items[selectedIndex]._selectItem(); // Eksekusi pilihan
+      }
+    } else if (e.key === 'Escape') {
+      customDropdown?.classList.add('hidden');
+      selectedIndex = -1;
+    }
+  });
+
+  // C. Tampilkan pilihan saat input difokuskan
+  inputNama?.addEventListener('focus', (e) => {
+    if (e.target.value) renderDropdown(e.target.value);
+  });
+
+  // D. Sembunyikan dropdown jika mengklik di luar area input
+  document.addEventListener('click', (e) => {
+    if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
+      customDropdown?.classList.add('hidden');
+      selectedIndex = -1;
+    }
+  });
+
+  // E. Pengiriman Form (Submit Handler)
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerText : 'KIRIM';
+    
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'MENGIRIM...';
+    }
+
+    const namaInput = inputNama.value;
+
+    const payload = {
+      "Submission Date": new Date().toLocaleString('id-ID'),
+      "Nama Siswa": namaInput,
+      "Kelas": inputKelas.value,
+      "Saat Ini": inputJilid.value,
+      "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
+      "Nama Proper": toProperCase(namaInput),
+      "Catatan": document.getElementById('catatan')?.value || ''
+    };
+
+    try {
+      const response = await fetch(SHEETDB_SUBMIT_URL, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: payload })
+      });
+
+      if (response.ok) {
+        document.getElementById('testForm')?.classList.add('hidden');
+        document.getElementById('suksesContainer')?.classList.remove('hidden');
+      } else {
+        alert('❌ Gagal menyimpan data. Coba lagi!');
+      }
+    } catch (error) {
+      console.error('Error Submit:', error);
+      alert('❌ Terjadi kesalahan koneksi.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+      }
+    }
+  });
+
+  // ==========================================
+  // 4. INISIALISASI (JALANKAN SAAT AWAL)
+  // ==========================================
+  fetchSiswa();
+</script>
   </body>
 </html>
