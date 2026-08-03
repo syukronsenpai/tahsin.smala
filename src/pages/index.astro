@@ -118,7 +118,7 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
           <div class="w-full">
             <!-- Input Radio Tersembunyi untuk Form Handler -->
             <input type="radio" id="radio-lulus" name="detailTes" value="LULUS" class="hidden" required />
-            <input type="radio" id="radio-mengulang" name="detailTes" value="MENGULANG LAGI" class="hidden" />
+            <input type="radio" id="radio-mengulang" name="detailTes" value="MENGULANG" class="hidden" />
 
             <!-- STATE 1: Tampilan Awal (Akan tersembunyi jika salah satu dipilih) -->
             <div id="option-container" class="flex items-center gap-3 w-full transition-all duration-300">
@@ -127,9 +127,9 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
                 LULUS
               </button>
 
-              <!-- Tombol MENGULANG LAGI -->
-              <button type="button" onclick="selectOption('MENGULANG LAGI')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
-                MENGULANG LAGI
+              <!-- Tombol MENGULANG -->
+              <button type="button" onclick="selectOption('MENGULANG')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
+                MENGULANG
               </button>
             </div>
 
@@ -429,6 +429,12 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
         }
 
         const namaInput = inputNama.value;
+        const catatanInput = document.getElementById('catatan')?.value || '';
+
+        // Membersihkan karakter aneh/enter di catatan agar JSON tetap valid
+        const catatanCleaned = catatanInput
+          .replace(/\r?\n|\r/g, " ") // Mengubah Enter menjadi spasi
+          .trim();
 
         const payload = {
           "Submission Date": new Date().toLocaleString('id-ID'),
@@ -437,27 +443,27 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
           "Saat Ini": inputJilid.value,
           "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
           "Nama Proper": toProperCase(namaInput),
-          "Catatan": document.getElementById('catatan')?.value || ''
+          "Catatan": catatanCleaned
         };
 
         try {
-          const response = await fetch(GAS_API_URL, {
+          // Menggunakan mode: 'no-cors' agar request Apps Script dari browser tidak terblokir
+          await fetch(GAS_API_URL, {
             method: 'POST',
+            mode: 'no-cors',
             headers: {
               'Content-Type': 'text/plain;charset=utf-8'
             },
             body: JSON.stringify({ data: payload })
           });
 
-          if (response.ok) {
-            document.getElementById('testForm')?.classList.add('hidden');
-            document.getElementById('suksesContainer')?.classList.remove('hidden');
-          } else {
-            alert('❌ Gagal menyimpan data. Coba lagi!');
-          }
+          // Karena mode no-cors, jika tidak ada error jaringan, kita anggap sukses
+          document.getElementById('testForm')?.classList.add('hidden');
+          document.getElementById('suksesContainer')?.classList.remove('hidden');
+
         } catch (error) {
           console.error('Error Submit:', error);
-          alert('❌ Terjadi kesalahan koneksi.');
+          alert('❌ Terjadi kesalahan koneksi saat mengirim data.');
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
