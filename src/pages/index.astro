@@ -16,24 +16,26 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Meta Tag Open Graph untuk WA / Medsos -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="New Form - Tes Kenaikan Jilid - SMART AULADI" />
-    <meta property="og:description" content="Formulir tes kenaikan jilid SD SMART AULADI Cirebon." />
     
-    <!-- Memanggil gambar thumb.png dari folder public -->
-    <meta property="og:image" content="https://tahsin-smala.vercel.app/thumb.png" />
-    <meta property="og:image:width" content="630" />
-    <meta property="og:image:height" content="630" />
+  <!-- Meta Tag Open Graph untuk WA / Medsos -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="New Form - Tes Kenaikan Jilid - SMART AULADI" />
+  <meta property="og:description" content="Formulir tes kenaikan jilid SD SMART AULADI Cirebon." />
+  
+  <!-- Memanggil gambar thumb.png dari folder public -->
+  <meta property="og:image" content="https://tahsin-smala.vercel.app/thumb.png" />
+  <meta property="og:image:width" content="630" />
+  <meta property="og:image:height" content="630" />
 
-    <!-- Ikon khusus saat dijadikan shortcut di Home Screen HP -->
-    <link rel="apple-touch-icon" href="/icon.png" />
+  <!-- Ikon khusus saat dijadikan shortcut di Home Screen HP -->
+  <link rel="apple-touch-icon" href="/icon.png" />
+
+
   </head>
-
   <!-- Splash Screen ditaruh di PALING ATAS di dalam <body> -->
-  <div id="splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
-    <div class="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
-  </div>
+    <div id="splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
+      <div class="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+    </div>
 
   <body class="bg-[#f3f4f8] min-h-screen py-8 sm:py-12 px-4 flex justify-center items-start font-['Inter',sans-serif] antialiased text-[#2c3e50] tracking-normal">
     
@@ -109,48 +111,48 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
           />
         </div>
 
-        <!-- Field 4: Detail Tes (Tombol Opsi) -->
-        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3 pt-1">
-          <label class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-1 select-none">
-            DETAIL TES <span class="text-red-500">*</span>
-          </label>
-          
-          <div class="w-full">
-            <!-- Input Radio Tersembunyi untuk Form Handler -->
-            <input type="radio" id="radio-lulus" name="detailTes" value="LULUS" class="hidden" required />
-            <input type="radio" id="radio-mengulang" name="detailTes" value="MENGULANG" class="hidden" />
+<!-- Field 4: Detail Tes (Tombol Opsi) -->
+<div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3 pt-1">
+  <label class="text-[12px] font-bold tracking-[0.05em] uppercase text-[#475569] pt-1 select-none">
+    DETAIL TES <span class="text-red-500">*</span>
+  </label>
+  
+  <div class="w-full">
+    <!-- Input Radio Tersembunyi untuk Form Handler -->
+    <input type="radio" id="radio-lulus" name="detailTes" value="LULUS" class="hidden" required />
+    <input type="radio" id="radio-mengulang" name="detailTes" value="MENGULANG" class="hidden" />
 
-            <!-- STATE 1: Tampilan Awal (Akan tersembunyi jika salah satu dipilih) -->
-            <div id="option-container" class="flex items-center gap-3 w-full transition-all duration-300">
-              <!-- Tombol LULUS -->
-              <button type="button" onclick="selectOption('LULUS')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
-                LULUS
-              </button>
+    <!-- STATE 1: Tampilan Awal (Akan tersembunyi jika salah satu dipilih) -->
+    <div id="option-container" class="flex items-center gap-3 w-full transition-all duration-300">
+      <!-- Tombol LULUS -->
+      <button type="button" onclick="selectOption('LULUS')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
+        LULUS
+      </button>
 
-              <!-- Tombol MENGULANG -->
-              <button type="button" onclick="selectOption('MENGULANG')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
-                MENGULANG
-              </button>
-            </div>
+      <!-- Tombol MENGULANG -->
+      <button type="button" onclick="selectOption('MENGULANG')" class="flex-1 cursor-pointer flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 text-center select-none">
+        MENGULANG
+      </button>
+    </div>
 
-            <!-- STATE 2: Tampilan Setelah Pilih (Rasio 70:30) -->
-            <div id="selected-container" class="hidden flex items-center gap-3 w-full transition-all duration-300">
-              <!-- 70% Opsi yang Dipilih -->
-              <div id="selected-btn" class="w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white rounded-md shadow-sm text-center select-none">
-                <span id="selected-text"></span>
-              </div>
+    <!-- STATE 2: Tampilan Setelah Pilih (Rasio 70:30) -->
+    <div id="selected-container" class="hidden flex items-center gap-3 w-full transition-all duration-300">
+      <!-- 70% Opsi yang Dipilih -->
+      <div id="selected-btn" class="w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white rounded-md shadow-sm text-center select-none">
+        <span id="selected-text"></span>
+      </div>
 
-              <!-- 30% Tombol Reset (Icon Putar) -->
-              <button type="button" onclick="resetOption()" title="Reset Pilihan" class="w-[30%] flex items-center justify-center py-2 px-3 bg-slate-600 hover:bg-slate-700 active:scale-95 text-white rounded-md shadow-sm transition-all duration-200 cursor-pointer select-none group">
-                <!-- SVG Icon Reset/Refresh -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24" />
-                  <path d="M21 3v6h-6" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
+      <!-- 30% Tombol Reset (Icon Putar) -->
+      <button type="button" onclick="resetOption()" title="Reset Pilihan" class="w-[30%] flex items-center justify-center py-2 px-3 bg-slate-600 hover:bg-slate-700 active:scale-95 text-white rounded-md shadow-sm transition-all duration-200 cursor-pointer select-none group">
+        <!-- SVG Icon Reset/Refresh -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24" />
+          <path d="M21 3v6h-6" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
 
         <!-- Field 5: Catatan (Textarea) -->
         <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-start gap-2 sm:gap-3">
@@ -177,316 +179,313 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
       </form>
 
-      <!-- Pesan Sukses (Sembunyi secara default) -->
-      <div id="suksesContainer" class="hidden p-6 sm:p-9 text-center space-y-4">
-        <h2 class="text-xl font-bold text-emerald-600">
-          ✅ Data berhasil disimpan!
-        </h2>
-        
-        <!-- Tombol utama: "Tes Anak Berikutnya" (Fungsional, ramah klik) -->
-        <button 
-          onclick="location.reload()" 
-          class="bg-[#10b981] hover:bg-[#059669] active:bg-[#047857] text-white font-bold text-[13px] tracking-[0.06em] uppercase px-12 py-2.5 rounded-[3px] transition-all duration-150 shadow-sm cursor-pointer"
-        >
-          Tes Anak Berikutnya
-        </button>
-      </div>
+<!-- Pesan Sukses (Sembunyi secara default) -->
+<div id="suksesContainer" class="hidden p-6 sm:p-9 text-center space-y-4">
+  <h2 class="text-xl font-bold text-emerald-600">
+    ✅ Data berhasil disimpan!
+  </h2>
+  
+  <!-- Tombol utama: "Tes Anak Berikutnya" (Fungsional, ramah klik) -->
+  <button 
+    onclick="location.reload()" 
+    class="bg-[#10b981] hover:bg-[#059669] active:bg-[#047857] text-white font-bold text-[13px] tracking-[0.06em] uppercase px-12 py-2.5 rounded-[3px] transition-all duration-150 shadow-sm cursor-pointer"
+  >
+    Tes Anak Berikutnya
+  </button>
+</div>
 
     </main>
 
-    <!-- Client-side Logic (Custom Search Dropdown & Google Apps Script Integration) -->
+    <!-- Client-side Logic (Custom Search Dropdown & SheetDB Cache) -->
     <script is:inline>
-      // ==========================================
-      // 1. KONFIGURASI URL GOOGLE APPS SCRIPT
-      // ==========================================
-      const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwMZYsRi29mUXPxdYTf7O8dmzH3trmWHmRsUx6WW_PNmIg6An8dgu9lSrNJN8rxj5eD/exec";
+  // ==========================================
+  // 1. KONFIGURASI & VARIABEL GLOBAL
+  // ==========================================
+  const SHEETDB_API_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=API-form";
+  const SHEETDB_SUBMIT_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=respons";
 
-      let dataSiswa = [];
-      let selectedIndex = -1; // Melacak indeks item yang disorot panah keyboard
+  let dataSiswa = [];
+  let selectedIndex = -1; // Melacak indeks item yang disorot panah keyboard
 
-      // Mengambil elemen HTML berdasarkan ID
-      const inputNama = document.getElementById('namaSiswa');
-      const customDropdown = document.getElementById('customDropdown');
-      const inputKelas = document.getElementById('kelas');
-      const inputJilid = document.getElementById('jilid');
-      const form = document.getElementById('testForm');
+  // Mengambil elemen HTML berdasarkan ID
+  const inputNama = document.getElementById('namaSiswa');
+  const customDropdown = document.getElementById('customDropdown');
+  const inputKelas = document.getElementById('kelas');
+  const inputJilid = document.getElementById('jilid');
+  const form = document.getElementById('testForm');
 
-      // ==========================================
-      // 2. FUNGSI-FUNGSI LOGIKA (UTILITY)
-      // ==========================================
+  // ==========================================
+  // 2. FUNGSI-FUNGSI LOGIKA (UTILITY)
+  // ==========================================
 
-      // A. Ambil Data dari Google Apps Script / Local Cache
-      async function fetchSiswa() {
-        const cachedData = localStorage.getItem('cache_gas_apiform');
-        if (cachedData) {
-          try {
-            dataSiswa = JSON.parse(cachedData);
-          } catch (e) {
-            console.error("Gagal membaca cache:", e);
-          }
-        }
-
-        try {
-          const response = await fetch(GAS_API_URL);
-          if (!response.ok) return;
-
-          const resJson = await response.json();
-          if (Array.isArray(resJson)) {
-            dataSiswa = resJson;
-            localStorage.setItem('cache_gas_apiform', JSON.stringify(dataSiswa));
-          }
-        } catch (error) {
-          console.error("Gagal koneksi Google Apps Script:", error);
-        }
+  // A. Ambil Data dari SheetDB / Local Cache
+  async function fetchSiswa() {
+    const cachedData = localStorage.getItem('cache_sheetdb_apiform');
+    if (cachedData) {
+      try {
+        dataSiswa = JSON.parse(cachedData);
+      } catch (e) {
+        console.error("Gagal membaca cache:", e);
       }
+    }
 
-      // B. Render Custom Dropdown
-      function renderDropdown(query = '') {
-        selectedIndex = -1; // Reset indeks setiap kali input diketik ulang
+    try {
+      const response = await fetch(SHEETDB_API_URL);
+      if (!response.ok) return;
 
-        if (!customDropdown) return;
-        const val = query.trim().toUpperCase();
+      const resJson = await response.json();
+      if (Array.isArray(resJson)) {
+        dataSiswa = resJson;
+        localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
+      }
+    } catch (error) {
+      console.error("Gagal koneksi SheetDB:", error);
+    }
+  }
 
-        if (!val) {
-          customDropdown.classList.add('hidden');
-          return;
-        }
+  // B. Render Custom Dropdown
+  function renderDropdown(query = '') {
+    selectedIndex = -1; // Reset indeks setiap kali input diketik ulang
 
-        // Filter nama siswa berdasarkan yang diketik
-        const filtered = dataSiswa.filter(s => 
-          s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
-        );
+    if (!customDropdown) return;
+    const val = query.trim().toUpperCase();
 
-        if (filtered.length === 0) {
-          customDropdown.classList.add('hidden');
-          return;
-        }
+    if (!val) {
+      customDropdown.classList.add('hidden');
+      return;
+    }
 
-        customDropdown.innerHTML = '';
+    // Filter nama siswa berdasarkan yang diketik
+    const filtered = dataSiswa.filter(s => 
+      s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
+    );
+
+    if (filtered.length === 0) {
+      customDropdown.classList.add('hidden');
+      return;
+    }
+
+    customDropdown.innerHTML = '';
+    
+    filtered.forEach(siswa => {
+      const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
+      const item = document.createElement('div');
+      
+      // Class 'dropdown-item' ditambahkan agar mudah ditarget oleh navigasi keyboard
+      item.className = "dropdown-item px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
+
+      // Highlight karakter yang cocok saat diketik
+      const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
+
+      // Action saat item dipilih (diklik atau di-enter)
+      const selectThisItem = () => {
+        inputNama.value = namaLengkap;
+        inputKelas.value = siswa["Kelas"] || "";
+        inputJilid.value = siswa["Saat Ini"] || "";
+        customDropdown.classList.add('hidden');
+        selectedIndex = -1;
+      };
+
+      item.addEventListener('click', selectThisItem);
+      item._selectItem = selectThisItem; // Simpan fungsi agar bisa dipanggil lewat tombol Enter
+
+      customDropdown.appendChild(item);
+    });
+
+    customDropdown.classList.remove('hidden');
+  }
+
+  // C. Update Tampilan Highlight Tombol Panah (Keyboard Navigation)
+  function updateHighlight(items) {
+    items.forEach((item, index) => {
+      if (index === selectedIndex) {
+        item.classList.add('bg-[#eff6ff]', 'text-[#2563eb]'); // Beri warna sorotan
+        item.scrollIntoView({ block: 'nearest' }); // Auto-scroll jika opsi panjang
+      } else {
+        item.classList.remove('bg-[#eff6ff]', 'text-[#2563eb]'); // Hapus warna sorotan
+      }
+    });
+  }
+
+  // D. Ubah teks menjadi Format Proper Case (Kapital di Awal Kata)
+  function toProperCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
+      return a.toUpperCase();
+    });
+  }
+
+  // E. Pilihan Kustom Tombol Radio (LULUS / MENGULANG)
+  function selectOption(value) {
+    const radioLulus = document.getElementById('radio-lulus');
+    const radioMengulang = document.getElementById('radio-mengulang');
+    const optionContainer = document.getElementById('option-container');
+    const selectedContainer = document.getElementById('selected-container');
+    const selectedBtn = document.getElementById('selected-btn');
+    const selectedText = document.getElementById('selected-text');
+
+    if (value === 'LULUS') {
+      if (radioLulus) radioLulus.checked = true;
+      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
+    } else {
+      if (radioMengulang) radioMengulang.checked = true;
+      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
+    }
+
+    if (selectedText) selectedText.innerText = value;
+    optionContainer?.classList.add('hidden');
+    selectedContainer?.classList.remove('hidden');
+  }
+
+  function resetOption() {
+    const radioLulus = document.getElementById('radio-lulus');
+    const radioMengulang = document.getElementById('radio-mengulang');
+    if (radioLulus) radioLulus.checked = false;
+    if (radioMengulang) radioMengulang.checked = false;
+
+    document.getElementById('option-container')?.classList.remove('hidden');
+    document.getElementById('selected-container')?.classList.add('hidden');
+  }
+
+  // ==========================================
+  // 3. EVENT LISTENERS (AKSI PENGGUNA)
+  // ==========================================
+
+  // A. Saat Pengguna Ketik di Input Nama
+  inputNama?.addEventListener('input', (e) => {
+    const val = e.target.value;
+    renderDropdown(val);
+
+    // Reset auto-fill jika input dibersihkan
+    if (!val) {
+      inputKelas.value = "";
+      inputJilid.value = "";
+    }
+  });
+
+  // B. Navigasi Keyboard (Tombol Panah Atas, Bawah, Enter, Escape)
+  inputNama?.addEventListener('keydown', (e) => {
+    // 1. FITUR HAPUS INSTAN DENGAN 1x BACKSPACE
+    if (e.key === 'Backspace') {
+      if (inputNama.value.length > 0) {
+        e.preventDefault(); // Mencegah hapus per-huruf
         
-        filtered.forEach(siswa => {
-          const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
-          const item = document.createElement('div');
-          
-          // Class 'dropdown-item' ditambahkan agar mudah ditarget oleh navigasi keyboard
-          item.className = "dropdown-item px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
-
-          // Highlight karakter yang cocok saat diketik
-          const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-          item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
-
-          // Action saat item dipilih (diklik atau di-enter)
-          const selectThisItem = () => {
-            inputNama.value = namaLengkap;
-            inputKelas.value = siswa["Kelas"] || "";
-            inputJilid.value = siswa["Saat Ini"] || "";
-            customDropdown.classList.add('hidden');
-            selectedIndex = -1;
-          };
-
-          item.addEventListener('click', selectThisItem);
-          item._selectItem = selectThisItem; // Simpan fungsi agar bisa dipanggil lewat tombol Enter
-
-          customDropdown.appendChild(item);
-        });
-
-        customDropdown.classList.remove('hidden');
+        inputNama.value = "";  // Kosongkan nama
+        inputKelas.value = ""; // Kosongkan kelas
+        inputJilid.value = ""; // Kosongkan jilid
+        
+        customDropdown?.classList.add('hidden'); // Sembunyikan dropdown
+        selectedIndex = -1;
+        return;
       }
+    }
 
-      // C. Update Tampilan Highlight Tombol Panah (Keyboard Navigation)
-      function updateHighlight(items) {
-        items.forEach((item, index) => {
-          if (index === selectedIndex) {
-            item.classList.add('bg-[#eff6ff]', 'text-[#2563eb]'); // Beri warna sorotan
-            item.scrollIntoView({ block: 'nearest' }); // Auto-scroll jika opsi panjang
-          } else {
-            item.classList.remove('bg-[#eff6ff]', 'text-[#2563eb]'); // Hapus warna sorotan
-          }
-        });
-      }
+    // 2. NAVIGASI ARROW & ENTER
+    if (customDropdown?.classList.contains('hidden')) return;
 
-      // D. Ubah teks menjadi Format Proper Case (Kapital di Awal Kata)
-      function toProperCase(str) {
-        if (!str) return '';
-        return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
-          return a.toUpperCase();
-        });
-      }
+    const items = customDropdown?.querySelectorAll('.dropdown-item');
+    if (!items || items.length === 0) return;
 
-      // E. Pilihan Kustom Tombol Radio (LULUS / MENGULANG)
-      window.selectOption = function(value) {
-        const radioLulus = document.getElementById('radio-lulus');
-        const radioMengulang = document.getElementById('radio-mengulang');
-        const optionContainer = document.getElementById('option-container');
-        const selectedContainer = document.getElementById('selected-container');
-        const selectedBtn = document.getElementById('selected-btn');
-        const selectedText = document.getElementById('selected-text');
-
-        if (value === 'LULUS') {
-          if (radioLulus) radioLulus.checked = true;
-          if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
-        } else {
-          if (radioMengulang) radioMengulang.checked = true;
-          if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
-        }
-
-        if (selectedText) selectedText.innerText = value;
-        optionContainer?.classList.add('hidden');
-        selectedContainer?.classList.remove('hidden');
-      };
-
-      window.resetOption = function() {
-        const radioLulus = document.getElementById('radio-lulus');
-        const radioMengulang = document.getElementById('radio-mengulang');
-        if (radioLulus) radioLulus.checked = false;
-        if (radioMengulang) radioMengulang.checked = false;
-
-        document.getElementById('option-container')?.classList.remove('hidden');
-        document.getElementById('selected-container')?.classList.add('hidden');
-      };
-
-      // ==========================================
-      // 3. EVENT LISTENERS (AKSI PENGGUNA)
-      // ==========================================
-
-      // A. Saat Pengguna Ketik di Input Nama
-      inputNama?.addEventListener('input', (e) => {
-        const val = e.target.value;
-        renderDropdown(val);
-
-        // Reset auto-fill jika input dibersihkan
-        if (!val) {
-          inputKelas.value = "";
-          inputJilid.value = "";
-        }
-      });
-
-      // B. Navigasi Keyboard (Tombol Panah Atas, Bawah, Enter, Escape)
-      inputNama?.addEventListener('keydown', (e) => {
-        // 1. FITUR HAPUS INSTAN DENGAN 1x BACKSPACE
-        if (e.key === 'Backspace') {
-          if (inputNama.value.length > 0) {
-            e.preventDefault(); // Mencegah hapus per-huruf
-            
-            inputNama.value = "";  // Kosongkan nama
-            inputKelas.value = ""; // Kosongkan kelas
-            inputJilid.value = ""; // Kosongkan jilid
-            
-            customDropdown?.classList.add('hidden'); // Sembunyikan dropdown
-            selectedIndex = -1;
-            return;
-          }
-        }
-
-        // 2. NAVIGASI ARROW & ENTER
-        if (customDropdown?.classList.contains('hidden')) return;
-
-        const items = customDropdown?.querySelectorAll('.dropdown-item');
-        if (!items || items.length === 0) return;
-
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex + 1) % items.length;
-          updateHighlight(items);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-          updateHighlight(items);
-        } else if (e.key === 'Enter') {
-          if (selectedIndex > -1 && items[selectedIndex]) {
-            e.preventDefault();
-            items[selectedIndex]._selectItem();
-          }
-        } else if (e.key === 'Escape') {
-          customDropdown?.classList.add('hidden');
-          selectedIndex = -1;
-        }
-      });
-
-      // C. Tampilkan pilihan saat input difokuskan
-      inputNama?.addEventListener('focus', (e) => {
-        if (e.target.value) renderDropdown(e.target.value);
-      });
-
-      // D. Sembunyikan dropdown jika mengklik di luar area input
-      document.addEventListener('click', (e) => {
-        if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
-          customDropdown?.classList.add('hidden');
-          selectedIndex = -1;
-        }
-      });
-
-      // E. Pengiriman Form (Submit Handler ke Google Apps Script)
-      form?.addEventListener('submit', async (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % items.length;
+      updateHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      updateHighlight(items);
+    } else if (e.key === 'Enter') {
+      if (selectedIndex > -1 && items[selectedIndex]) {
         e.preventDefault();
+        items[selectedIndex]._selectItem();
+      }
+    } else if (e.key === 'Escape') {
+      customDropdown?.classList.add('hidden');
+      selectedIndex = -1;
+    }
+  });
 
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn ? submitBtn.innerText : 'SUBMIT';
-        
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerText = 'MENGIRIM...';
-        }
+  // C. Tampilkan pilihan saat input difokuskan
+  inputNama?.addEventListener('focus', (e) => {
+    if (e.target.value) renderDropdown(e.target.value);
+  });
 
-        const namaInput = inputNama.value;
-        const catatanInput = document.getElementById('catatan')?.value || '';
+  // D. Sembunyikan dropdown jika mengklik di luar area input
+  document.addEventListener('click', (e) => {
+    if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
+      customDropdown?.classList.add('hidden');
+      selectedIndex = -1;
+    }
+  });
 
-        // Membersihkan karakter aneh/enter di catatan agar JSON tetap valid
-        const catatanCleaned = catatanInput
-          .replace(/\r?\n|\r/g, " ") // Mengubah Enter menjadi spasi
-          .trim();
+  // E. Pengiriman Form (Submit Handler)
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const payload = {
-          "Submission Date": new Date().toLocaleString('id-ID'),
-          "Nama Siswa": namaInput,
-          "Kelas": inputKelas.value,
-          "Saat Ini": inputJilid.value,
-          "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
-          "Nama Proper": toProperCase(namaInput),
-          "Catatan": catatanCleaned
-        };
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerText : 'KIRIM';
+    
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'MENGIRIM...';
+    }
 
-        try {
-          // Menggunakan mode: 'no-cors' agar request Apps Script dari browser tidak terblokir
-          await fetch(GAS_API_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-              'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify({ data: payload })
-          });
+    const namaInput = inputNama.value;
 
-          // Karena mode no-cors, jika tidak ada error jaringan, kita anggap sukses
-          document.getElementById('testForm')?.classList.add('hidden');
-          document.getElementById('suksesContainer')?.classList.remove('hidden');
+    const payload = {
+      "Submission Date": new Date().toLocaleString('id-ID'),
+      "Nama Siswa": namaInput,
+      "Kelas": inputKelas.value,
+      "Saat Ini": inputJilid.value,
+      "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
+      "Nama Proper": toProperCase(namaInput),
+      "Catatan": document.getElementById('catatan')?.value || ''
+    };
 
-        } catch (error) {
-          console.error('Error Submit:', error);
-          alert('❌ Terjadi kesalahan koneksi saat mengirim data.');
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-          }
-        }
+    try {
+      const response = await fetch(SHEETDB_SUBMIT_URL, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: payload })
       });
 
-      // ==========================================
-      // 4. INISIALISASI (JALANKAN SAAT AWAL)
-      // ==========================================
-      fetchSiswa();
+      if (response.ok) {
+        document.getElementById('testForm')?.classList.add('hidden');
+        document.getElementById('suksesContainer')?.classList.remove('hidden');
+      } else {
+        alert('❌ Gagal menyimpan data. Coba lagi!');
+      }
+    } catch (error) {
+      console.error('Error Submit:', error);
+      alert('❌ Terjadi kesalahan koneksi.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+      }
+    }
+  });
 
-      // ==========================================
-      // 5. SCRIPT SPLASH SCREEN (HILANGKAN SETELAH HALAMAN SIAP)
-      // ==========================================
-      window.addEventListener('DOMContentLoaded', () => {
+  // ==========================================
+  // 4. INISIALISASI (JALANKAN SAAT AWAL)
+  // ==========================================
+  fetchSiswa();
+
+  // ==========================================
+  // 5. SCRIPT SPLASH SCREEN (HILANGKAN SETELAH HALAMAN SIAP)
+  // ==========================================
+  window.addEventListener('DOMContentLoaded', () => {
         const splash = document.getElementById('splash-screen');
         if (splash) {
           splash.classList.add('opacity-0', 'pointer-events-none');
           setTimeout(() => splash.remove(), 500);
         }
       });
-    </script>
+
+</script>
   </body>
 </html>
