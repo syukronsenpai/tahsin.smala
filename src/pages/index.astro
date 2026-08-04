@@ -15,7 +15,6 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     
   <!-- Meta Tag Open Graph untuk WA / Medsos -->
   <meta property="og:type" content="website" />
@@ -196,296 +195,300 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
     </main>
 
-    <!-- Client-side Logic (Custom Search Dropdown & SheetDB Cache) -->
-    <script is:inline>
-  // ==========================================
-  // 1. KONFIGURASI & VARIABEL GLOBAL
-  // ==========================================
-  const SHEETDB_API_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=API-form";
-  const SHEETDB_SUBMIT_URL = "https://sheetdb.io/api/v1/yjshg6rfim0r8?sheet=respons";
+    <!-- Client-side Logic (Custom Search Dropdown & Supabase) -->
+    <script is:inline type="module">
+// ==========================================
+// 1. IMPORT CDN SUPABASE & KONFIGURASI
+// ==========================================
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  let dataSiswa = [];
-  let selectedIndex = -1; // Melacak indeks item yang disorot panah keyboard
+const SHEETDB_API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRlkxd8dmQkdKm720azA9vog-nI06aVC8AX-c0gKMZx7Q2XBIbO31C4em-DKsSj7GdqtluPVfRYp4Gk/pub?gid=1481426139&single=true&output=csv";
 
-  // Mengambil elemen HTML berdasarkan ID
-  const inputNama = document.getElementById('namaSiswa');
-  const customDropdown = document.getElementById('customDropdown');
-  const inputKelas = document.getElementById('kelas');
-  const inputJilid = document.getElementById('jilid');
-  const form = document.getElementById('testForm');
+// Konfigurasi Supabase
+const SUPABASE_URL = "https://vxwokdpgkarhiighnybq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_e99BJ-n7_TyiPQB88uDcwA_N0xjtygX";
 
-  // ==========================================
-  // 2. FUNGSI-FUNGSI LOGIKA (UTILITY)
-  // ==========================================
+// Inisialisasi Supabase Client via ESM import (Dijamin 100% Terhubung)
+const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false }
+});
 
-  // A. Ambil Data dari SheetDB / Local Cache
-  async function fetchSiswa() {
-    const cachedData = localStorage.getItem('cache_sheetdb_apiform');
-    if (cachedData) {
-      try {
-        dataSiswa = JSON.parse(cachedData);
-      } catch (e) {
-        console.error("Gagal membaca cache:", e);
-      }
-    }
+let dataSiswa = [];
+let selectedIndex = -1;
 
+const inputNama = document.getElementById('namaSiswa');
+const customDropdown = document.getElementById('customDropdown');
+const inputKelas = document.getElementById('kelas');
+const inputJilid = document.getElementById('jilid');
+const form = document.getElementById('testForm');
+
+// ==========================================
+// 2. FUNGSI-FUNGSI LOGIKA (UTILITY)
+// ==========================================
+
+async function fetchSiswa() {
+  const cachedData = localStorage.getItem('cache_sheetdb_apiform');
+  if (cachedData) {
     try {
-      const response = await fetch(SHEETDB_API_URL);
-      if (!response.ok) return;
-
-      const resJson = await response.json();
-      if (Array.isArray(resJson)) {
-        dataSiswa = resJson;
-        localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
-      }
-    } catch (error) {
-      console.error("Gagal koneksi SheetDB:", error);
+      dataSiswa = JSON.parse(cachedData);
+    } catch (e) {
+      console.error("Gagal membaca cache:", e);
     }
   }
 
-  // B. Render Custom Dropdown
-  function renderDropdown(query = '') {
-    selectedIndex = -1; // Reset indeks setiap kali input diketik ulang
+  try {
+    const response = await fetch(SHEETDB_API_URL);
+    if (!response.ok) return;
 
-    if (!customDropdown) return;
-    const val = query.trim().toUpperCase();
+    const csvText = await response.text();
+    const lines = csvText.split('\n').filter(line => line.trim() !== '');
+    if (lines.length > 0) {
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const parsedData = [];
 
-    if (!val) {
-      customDropdown.classList.add('hidden');
-      return;
+      for (let i = 1; i < lines.length; i++) {
+        const currentLine = lines[i].split(',').map(item => item.trim().replace(/^"|"$/g, ''));
+        if (currentLine.length === headers.length) {
+          let obj = {};
+          headers.forEach((header, index) => {
+            obj[header] = currentLine[index];
+          });
+          parsedData.push(obj);
+        }
+      }
+
+      dataSiswa = parsedData;
+      localStorage.setItem('cache_sheetdb_apiform', JSON.stringify(dataSiswa));
     }
+  } catch (error) {
+    console.error("Gagal koneksi data CSV:", error);
+  }
+}
 
-    // Filter nama siswa berdasarkan yang diketik
-    const filtered = dataSiswa.filter(s => 
-      s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
-    );
+function renderDropdown(query = '') {
+  selectedIndex = -1;
+  if (!customDropdown) return;
+  const val = query.trim().toUpperCase();
 
-    if (filtered.length === 0) {
-      customDropdown.classList.add('hidden');
-      return;
-    }
+  if (!val) {
+    customDropdown.classList.add('hidden');
+    return;
+  }
 
-    customDropdown.innerHTML = '';
+  const filtered = dataSiswa.filter(s => 
+    s["Nama Siswa"] && String(s["Nama Siswa"]).toUpperCase().includes(val)
+  );
+
+  if (filtered.length === 0) {
+    customDropdown.classList.add('hidden');
+    return;
+  }
+
+  customDropdown.innerHTML = '';
+  
+  filtered.forEach(siswa => {
+    const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
+    const item = document.createElement('div');
     
-    filtered.forEach(siswa => {
-      const namaLengkap = String(siswa["Nama Siswa"]).toUpperCase();
-      const item = document.createElement('div');
-      
-      // Class 'dropdown-item' ditambahkan agar mudah ditarget oleh navigasi keyboard
-      item.className = "dropdown-item px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
+    item.className = "dropdown-item px-3.5 py-2 text-[12.5px] font-semibold text-[#334155] hover:bg-[#eff6ff] hover:text-[#2563eb] cursor-pointer transition-colors";
 
-      // Highlight karakter yang cocok saat diketik
-      const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
+    const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    item.innerHTML = namaLengkap.replace(regex, '<span class="font-extrabold text-black bg-yellow-200/80 rounded-[2px] px-0.5">$1</span>');
 
-      // Action saat item dipilih (diklik atau di-enter)
-      const selectThisItem = () => {
-        inputNama.value = namaLengkap;
-        inputKelas.value = siswa["Kelas"] || "";
-        inputJilid.value = siswa["Saat Ini"] || "";
-        customDropdown.classList.add('hidden');
-        selectedIndex = -1;
-      };
-
-      item.addEventListener('click', selectThisItem);
-      item._selectItem = selectThisItem; // Simpan fungsi agar bisa dipanggil lewat tombol Enter
-
-      customDropdown.appendChild(item);
-    });
-
-    customDropdown.classList.remove('hidden');
-  }
-
-  // C. Update Tampilan Highlight Tombol Panah (Keyboard Navigation)
-  function updateHighlight(items) {
-    items.forEach((item, index) => {
-      if (index === selectedIndex) {
-        item.classList.add('bg-[#eff6ff]', 'text-[#2563eb]'); // Beri warna sorotan
-        item.scrollIntoView({ block: 'nearest' }); // Auto-scroll jika opsi panjang
-      } else {
-        item.classList.remove('bg-[#eff6ff]', 'text-[#2563eb]'); // Hapus warna sorotan
-      }
-    });
-  }
-
-  // D. Ubah teks menjadi Format Proper Case (Kapital di Awal Kata)
-  function toProperCase(str) {
-    if (!str) return '';
-    return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
-      return a.toUpperCase();
-    });
-  }
-
-  // E. Pilihan Kustom Tombol Radio (LULUS / MENGULANG)
-  function selectOption(value) {
-    const radioLulus = document.getElementById('radio-lulus');
-    const radioMengulang = document.getElementById('radio-mengulang');
-    const optionContainer = document.getElementById('option-container');
-    const selectedContainer = document.getElementById('selected-container');
-    const selectedBtn = document.getElementById('selected-btn');
-    const selectedText = document.getElementById('selected-text');
-
-    if (value === 'LULUS') {
-      if (radioLulus) radioLulus.checked = true;
-      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
-    } else {
-      if (radioMengulang) radioMengulang.checked = true;
-      if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
-    }
-
-    if (selectedText) selectedText.innerText = value;
-    optionContainer?.classList.add('hidden');
-    selectedContainer?.classList.remove('hidden');
-  }
-
-  function resetOption() {
-    const radioLulus = document.getElementById('radio-lulus');
-    const radioMengulang = document.getElementById('radio-mengulang');
-    if (radioLulus) radioLulus.checked = false;
-    if (radioMengulang) radioMengulang.checked = false;
-
-    document.getElementById('option-container')?.classList.remove('hidden');
-    document.getElementById('selected-container')?.classList.add('hidden');
-  }
-
-  // ==========================================
-  // 3. EVENT LISTENERS (AKSI PENGGUNA)
-  // ==========================================
-
-  // A. Saat Pengguna Ketik di Input Nama
-  inputNama?.addEventListener('input', (e) => {
-    const val = e.target.value;
-    renderDropdown(val);
-
-    // Reset auto-fill jika input dibersihkan
-    if (!val) {
-      inputKelas.value = "";
-      inputJilid.value = "";
-    }
-  });
-
-  // B. Navigasi Keyboard (Tombol Panah Atas, Bawah, Enter, Escape)
-  inputNama?.addEventListener('keydown', (e) => {
-    // 1. FITUR HAPUS INSTAN DENGAN 1x BACKSPACE
-    if (e.key === 'Backspace') {
-      if (inputNama.value.length > 0) {
-        e.preventDefault(); // Mencegah hapus per-huruf
-        
-        inputNama.value = "";  // Kosongkan nama
-        inputKelas.value = ""; // Kosongkan kelas
-        inputJilid.value = ""; // Kosongkan jilid
-        
-        customDropdown?.classList.add('hidden'); // Sembunyikan dropdown
-        selectedIndex = -1;
-        return;
-      }
-    }
-
-    // 2. NAVIGASI ARROW & ENTER
-    if (customDropdown?.classList.contains('hidden')) return;
-
-    const items = customDropdown?.querySelectorAll('.dropdown-item');
-    if (!items || items.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      selectedIndex = (selectedIndex + 1) % items.length;
-      updateHighlight(items);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-      updateHighlight(items);
-    } else if (e.key === 'Enter') {
-      if (selectedIndex > -1 && items[selectedIndex]) {
-        e.preventDefault();
-        items[selectedIndex]._selectItem();
-      }
-    } else if (e.key === 'Escape') {
-      customDropdown?.classList.add('hidden');
+    const selectThisItem = () => {
+      inputNama.value = namaLengkap;
+      inputKelas.value = siswa["Kelas"] || "";
+      inputJilid.value = siswa["Saat Ini"] || "";
+      customDropdown.classList.add('hidden');
       selectedIndex = -1;
-    }
-  });
-
-  // C. Tampilkan pilihan saat input difokuskan
-  inputNama?.addEventListener('focus', (e) => {
-    if (e.target.value) renderDropdown(e.target.value);
-  });
-
-  // D. Sembunyikan dropdown jika mengklik di luar area input
-  document.addEventListener('click', (e) => {
-    if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
-      customDropdown?.classList.add('hidden');
-      selectedIndex = -1;
-    }
-  });
-
-  // E. Pengiriman Form (Submit Handler)
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn ? submitBtn.innerText : 'KIRIM';
-    
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'MENGIRIM...';
-    }
-
-    const namaInput = inputNama.value;
-
-    const payload = {
-      "Submission Date": new Date().toLocaleString('id-ID'),
-      "Nama Siswa": namaInput,
-      "Kelas": inputKelas.value,
-      "Saat Ini": inputJilid.value,
-      "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
-      "Nama Proper": toProperCase(namaInput),
-      "Catatan": document.getElementById('catatan')?.value || ''
     };
 
-    try {
-      const response = await fetch(SHEETDB_SUBMIT_URL, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ data: payload })
-      });
+    item.addEventListener('click', selectThisItem);
+    item._selectItem = selectThisItem;
 
-      if (response.ok) {
-        document.getElementById('testForm')?.classList.add('hidden');
-        document.getElementById('suksesContainer')?.classList.remove('hidden');
-      } else {
-        alert('❌ Gagal menyimpan data. Coba lagi!');
-      }
-    } catch (error) {
-      console.error('Error Submit:', error);
-      alert('❌ Terjadi kesalahan koneksi.');
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalBtnText;
-      }
-    }
+    customDropdown.appendChild(item);
   });
 
-  // ==========================================
-  // 4. INISIALISASI (JALANKAN SAAT AWAL)
-  // ==========================================
-  fetchSiswa();
+  customDropdown.classList.remove('hidden');
+}
 
-  // ==========================================
-  // 5. SCRIPT SPLASH SCREEN (HILANGKAN SETELAH HALAMAN SIAP)
-  // ==========================================
-  window.addEventListener('DOMContentLoaded', () => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-          splash.classList.add('opacity-0', 'pointer-events-none');
-          setTimeout(() => splash.remove(), 500);
-        }
-      });
+function updateHighlight(items) {
+  items.forEach((item, index) => {
+    if (index === selectedIndex) {
+      item.classList.add('bg-[#eff6ff]', 'text-[#2563eb]');
+      item.scrollIntoView({ block: 'nearest' });
+    } else {
+      item.classList.remove('bg-[#eff6ff]', 'text-[#2563eb]');
+    }
+  });
+}
 
+function toProperCase(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) {
+    return a.toUpperCase();
+  });
+}
+
+function selectOption(value) {
+  const radioLulus = document.getElementById('radio-lulus');
+  const radioMengulang = document.getElementById('radio-mengulang');
+  const optionContainer = document.getElementById('option-container');
+  const selectedContainer = document.getElementById('selected-container');
+  const selectedBtn = document.getElementById('selected-btn');
+  const selectedText = document.getElementById('selected-text');
+
+  if (value === 'LULUS') {
+    if (radioLulus) radioLulus.checked = true;
+    if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#10b981] rounded-md shadow-sm text-center select-none";
+  } else {
+    if (radioMengulang) radioMengulang.checked = true;
+    if (selectedBtn) selectedBtn.className = "w-[70%] flex items-center justify-center py-2 px-3 text-[12px] font-bold tracking-[0.05em] uppercase text-white bg-[#ef4444] rounded-md shadow-sm text-center select-none";
+  }
+
+  if (selectedText) selectedText.innerText = value;
+  optionContainer?.classList.add('hidden');
+  selectedContainer?.classList.remove('hidden');
+}
+
+function resetOption() {
+  const radioLulus = document.getElementById('radio-lulus');
+  const radioMengulang = document.getElementById('radio-mengulang');
+  if (radioLulus) radioLulus.checked = false;
+  if (radioMengulang) radioMengulang.checked = false;
+
+  document.getElementById('option-container')?.classList.remove('hidden');
+  document.getElementById('selected-container')?.classList.add('hidden');
+}
+
+// Menjadikan fungsi seleksi bisa diakses global oleh atribut onclick HTML
+window.selectOption = selectOption;
+window.resetOption = resetOption;
+
+// ==========================================
+// 3. EVENT LISTENERS
+// ==========================================
+
+inputNama?.addEventListener('input', (e) => {
+  const val = e.target.value;
+  renderDropdown(val);
+
+  if (!val) {
+    inputKelas.value = "";
+    inputJilid.value = "";
+  }
+});
+
+inputNama?.addEventListener('keydown', (e) => {
+  if (e.key === 'Backspace') {
+    if (inputNama.value.length > 0) {
+      e.preventDefault();
+      
+      inputNama.value = "";
+      inputKelas.value = "";
+      inputJilid.value = "";
+      
+      customDropdown?.classList.add('hidden');
+      selectedIndex = -1;
+      return;
+    }
+  }
+
+  if (customDropdown?.classList.contains('hidden')) return;
+
+  const items = customDropdown?.querySelectorAll('.dropdown-item');
+  if (!items || items.length === 0) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedIndex = (selectedIndex + 1) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'Enter') {
+    if (selectedIndex > -1 && items[selectedIndex]) {
+      e.preventDefault();
+      items[selectedIndex]._selectItem();
+    }
+  } else if (e.key === 'Escape') {
+    customDropdown?.classList.add('hidden');
+    selectedIndex = -1;
+  }
+});
+
+inputNama?.addEventListener('focus', (e) => {
+  if (e.target.value) renderDropdown(e.target.value);
+});
+
+document.addEventListener('click', (e) => {
+  if (!inputNama?.contains(e.target) && !customDropdown?.contains(e.target)) {
+    customDropdown?.classList.add('hidden');
+    selectedIndex = -1;
+  }
+});
+
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerText : 'KIRIM';
+  
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'MENGIRIM...';
+  }
+
+  const namaInput = inputNama.value;
+
+  const payload = {
+    "Submission Date": new Date().toLocaleString('id-ID'),
+    "Nama Siswa": namaInput,
+    "Kelas": inputKelas.value,
+    "Saat Ini": inputJilid.value,
+    "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
+    "Nama Proper": toProperCase(namaInput),
+    "Catatan": document.getElementById('catatan')?.value || ''
+  };
+
+  try {
+    const { data, error } = await _supabase
+      .from('hasil_tes')
+      .insert([payload]);
+
+    if (!error) {
+      document.getElementById('testForm')?.classList.add('hidden');
+      document.getElementById('suksesContainer')?.classList.remove('hidden');
+    } else {
+      console.error('Error Supabase:', error);
+      alert('❌ Gagal menyimpan data: ' + error.message);
+    }
+  } catch (error) {
+    console.error('Error Submit:', error);
+    alert('❌ Terjadi kesalahan koneksi.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = originalBtnText;
+    }
+  }
+});
+
+// ==========================================
+// 4. INISIALISASI & SPLASH SCREEN
+// ==========================================
+fetchSiswa();
+
+function hideSplash() {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    splash.classList.add('opacity-0', 'pointer-events-none');
+    setTimeout(() => splash.remove(), 500);
+  }
+}
+
+hideSplash();
 </script>
   </body>
 </html>
