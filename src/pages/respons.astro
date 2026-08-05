@@ -28,7 +28,7 @@ import '../styles/global.css';
         <h1 class="text-base font-bold text-slate-800 tracking-tight">Hasil Tes Kenaikan Jilid</h1>
       </div>
       
-      <!-- Counter Data Masuk menggantikan posisi & style tombol refresh -->
+      <!-- Counter Data Masuk -->
       <div 
         id="data-counter" 
         class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm"
@@ -90,13 +90,18 @@ import '../styles/global.css';
           return;
         }
 
+        const totalItems = data.length;
+
         // Update jumlah data secara dinamis
         if (counterText) {
-          counterText.innerText = `${data.length} Data Masuk`;
+          counterText.innerText = `${totalItems} Data Masuk`;
         }
 
         let html = '';
-        data.forEach(item => {
+        data.forEach((item, index) => {
+          // Penomoran berurut kronologis (data paling bawah #1, data terbaru angka terbesar)
+          const nomorUrut = totalItems - index;
+
           const detailTes = item['Detail Tes'] || '-';
           const isLulus = String(detailTes).toUpperCase() === 'LULUS';
           
@@ -139,9 +144,10 @@ import '../styles/global.css';
                 </div>
               ` : ''}
 
-              <!-- Bottom Timestamp -->
-              <div class="mt-3 pt-2 border-t border-slate-50 text-[10px] font-medium text-slate-400 text-right">
-                ${date}
+              <!-- Bottom Row: Nomor Urut (Kiri) & Timestamp (Kanan) -->
+              <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between text-[10px] font-medium text-slate-400">
+                <span>#${nomorUrut}</span>
+                <span>${date}</span>
               </div>
             </div>
           `;
