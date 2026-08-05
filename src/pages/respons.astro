@@ -82,7 +82,7 @@ import '../styles/global.css';
         const { data, error } = await supabaseClient
           .from('hasil_tes')
           .select('*')
-          .order('id', { ascending: false });
+          .order('id', { ascending: true }); // Mengurutkan dari yang paling pertama/lama (1) ke terbaru
 
         if (error || !data || data.length === 0) {
           container.innerHTML = emptyUI;
@@ -99,8 +99,7 @@ import '../styles/global.css';
 
         let html = '';
         data.forEach((item, index) => {
-          // Penomoran berurut kronologis (data paling bawah #1, data terbaru angka terbesar)
-          const nomorUrut = totalItems - index;
+          const nomorUrut = index + 1; // Berurut dari 1, 2, 3 ke bawah
 
           const detailTes = item['Detail Tes'] || '-';
           const isLulus = String(detailTes).toUpperCase() === 'LULUS';
@@ -144,10 +143,12 @@ import '../styles/global.css';
                 </div>
               ` : ''}
 
-              <!-- Bottom Row: Nomor Urut (Kiri) & Timestamp (Kanan) -->
-              <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between text-[10px] font-medium text-slate-400">
-                <span>#${nomorUrut}</span>
-                <span>${date}</span>
+              <!-- Bottom Row: Nomor Lingkaran (Kiri) & Timestamp (Kanan) -->
+              <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400">
+                <span class="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold text-[10px]">
+                  ${nomorUrut}
+                </span>
+                <span class="font-medium">${date}</span>
               </div>
             </div>
           `;
