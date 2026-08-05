@@ -170,10 +170,11 @@
       const emptyUI = `<div class="empty-state">📥 Belum ada data yang masuk</div>`;
 
       try {
+        // Mengurutkan berdasarkan ID secara descending (terbaru di atas)
         const { data, error } = await supabaseClient
           .from('hasil_tes')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('id', { ascending: false });
 
         if (error || !data || data.length === 0) {
           container.innerHTML = emptyUI;
@@ -182,16 +183,17 @@
 
         let html = '';
         data.forEach(item => {
-          const detailTes = item['Detail Tes'] || item['detail_tes'] || '-';
-          const isLulus = detailTes.toUpperCase() === 'LULUS';
+          const detailTes = item['Detail Tes'] || '-';
+          const isLulus = String(detailTes).toUpperCase() === 'LULUS';
           const badgeClass = isLulus ? '' : 'mengulang';
           const cardClass = isLulus ? '' : 'mengulang';
 
-          const nama = item['Nama Siswa'] || item['nama_siswa'] || '-';
-          const kelas = item['Kelas'] || item['kelas'] || '-';
-          const jilid = item['Saat Ini'] || item['saat_ini'] || '-';
-          const catatan = item['Catatan'] || item['catatan'] || null;
-          const date = item['created_at'] ? new Date(item['created_at']).toLocaleString('id-ID') : (item['Submission Date'] || '-');
+          // Memprioritaskan Nama Proper jika ada, jika tidak pakai Nama Siswa
+          const nama = item['Nama Proper'] || item['Nama Siswa'] || '-';
+          const kelas = item['Kelas'] || '-';
+          const jilid = item['Saat Ini'] || '-';
+          const catatan = item['Catatan'] || null;
+          const date = item['Submission Date'] || '-';
 
           html += `
             <div class="card ${cardClass}">
@@ -216,6 +218,7 @@
       }
     }
 
+    // Auto refresh data
     function setupRealtime() {
       supabaseClient
         .channel('realtime-hasil-tes')
