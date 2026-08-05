@@ -27,6 +27,14 @@ import '../styles/global.css';
         <span class="text-xl">📋</span>
         <h1 class="text-base font-bold text-slate-800 tracking-tight">Hasil Tes Kenaikan Jilid</h1>
       </div>
+      
+      <!-- Counter Data Masuk menggantikan posisi & style tombol refresh -->
+      <div 
+        id="data-counter" 
+        class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm"
+      >
+        <span id="count-text">0 Data Masuk</span>
+      </div>
     </div>
   </header>
 
@@ -59,6 +67,7 @@ import '../styles/global.css';
 
     async function loadData() {
       const container = document.getElementById("content");
+      const counterText = document.getElementById("count-text");
       if (!container) return;
 
       const emptyUI = `
@@ -77,7 +86,13 @@ import '../styles/global.css';
 
         if (error || !data || data.length === 0) {
           container.innerHTML = emptyUI;
+          if (counterText) counterText.innerText = "0 Data Masuk";
           return;
+        }
+
+        // Update jumlah data secara dinamis
+        if (counterText) {
+          counterText.innerText = `${data.length} Data Masuk`;
         }
 
         let html = '';
@@ -136,6 +151,7 @@ import '../styles/global.css';
 
       } catch (err) {
         container.innerHTML = emptyUI;
+        if (counterText) counterText.innerText = "0 Data Masuk";
       }
     }
 
