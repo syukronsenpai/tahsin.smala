@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "view-tahsin.vercel.app"
+        }
+      ],
+      "source": "/",
+      "destination": "/respons",
+      "permanent": false
+    }
+  ]
+}
