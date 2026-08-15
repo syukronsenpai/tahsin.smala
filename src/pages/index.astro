@@ -455,49 +455,14 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Fungsi untuk menampilkan modal peringatan
-function showWarningModal() {
-    const modal = document.getElementById('warningModal');
-    const content = document.getElementById('modalContent');
-    if (modal && content) {
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-}
-
-// Fungsi untuk menutup modal peringatan
-function closeWarningModal() {
-    const modal = document.getElementById('warningModal');
-    const content = document.getElementById('modalContent');
-    if (modal && content) {
-        content.classList.remove('scale-100', 'opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    }
-}
-
-// Event listener agar modal tertutup saat area luar (backdrop) diklik
-document.getElementById('warningModal')?.addEventListener('click', function(event) {
-    if (event.target === this) {
-        closeWarningModal();
-    }
-});
-
-// Event Listener Submit Form Anda
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // Validasi: Cek apakah detail tes sudah dipilih
+  // Validasi: Cek apakah Detail Tes sudah dipilih (jika belum, hentikan dan munculkan pop-up)
   const detailTesValue = form.querySelector('input[name="detailTes"]:checked')?.value;
-  
   if (!detailTesValue) {
-      showWarningModal(); // Munculkan pop-up jika belum dipilih
-      return; // Hentikan proses submit
+      showWarningModal();
+      return;
   }
 
   const submitBtn = form.querySelector('button[type="submit"]');
