@@ -193,6 +193,32 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
   </button>
 </div>
 
+
+<!-- Modal Peringatan Detail Tes Belum Dipilih -->
+<div id="warningModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative transform transition-all scale-95 opacity-0 duration-300" id="modalContent">
+        <!-- Tombol Close Merah di Kanan Atas -->
+        <button onclick="closeWarningModal()" class="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors shadow-md focus:outline-none cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Konten Pop-up -->
+        <div class="text-center mt-2">
+            <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100 text-red-500 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Peringatan</h3>
+            <p class="text-gray-600 text-sm mb-6">Maaf Hasil Tes Belum di Pilih!</p>
+            <button onclick="closeWarningModal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2.5 px-4 rounded-xl transition-colors shadow cursor-pointer">
+                Mengerti
+            </button>
+        </div>
+    </div>
+</div>
     </main>
 
     <!-- Client-side Logic (Custom Search Dropdown & Supabase) -->
@@ -429,8 +455,50 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Fungsi untuk menampilkan modal peringatan
+function showWarningModal() {
+    const modal = document.getElementById('warningModal');
+    const content = document.getElementById('modalContent');
+    if (modal && content) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+}
+
+// Fungsi untuk menutup modal peringatan
+function closeWarningModal() {
+    const modal = document.getElementById('warningModal');
+    const content = document.getElementById('modalContent');
+    if (modal && content) {
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+}
+
+// Event listener agar modal tertutup saat area luar (backdrop) diklik
+document.getElementById('warningModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeWarningModal();
+    }
+});
+
+// Event Listener Submit Form Anda
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  // Validasi: Cek apakah detail tes sudah dipilih
+  const detailTesValue = form.querySelector('input[name="detailTes"]:checked')?.value;
+  
+  if (!detailTesValue) {
+      showWarningModal(); // Munculkan pop-up jika belum dipilih
+      return; // Hentikan proses submit
+  }
 
   const submitBtn = form.querySelector('button[type="submit"]');
   const originalBtnText = submitBtn ? submitBtn.innerText : 'KIRIM';
@@ -447,7 +515,7 @@ form?.addEventListener('submit', async (e) => {
     "Nama Siswa": namaInput,
     "Kelas": inputKelas.value,
     "Saat Ini": inputJilid.value,
-    "Detail Tes": form.querySelector('input[name="detailTes"]:checked')?.value || '',
+    "Detail Tes": detailTesValue,
     "Nama Proper": toProperCase(namaInput),
     "Catatan": document.getElementById('catatan')?.value || ''
   };
