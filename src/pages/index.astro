@@ -1,4 +1,3 @@
----
 import '../styles/global.css';
 import { Image } from 'astro:assets';
 
@@ -28,7 +27,6 @@ const headerImageUrl = "https://files.jotform.com/jufs/syukron2123%2Fform_files%
 
   <!-- Ikon khusus saat dijadikan shortcut di Home Screen HP -->
   <link rel="apple-touch-icon" href="/icon.png" />
-
 
   </head>
   <!-- Splash Screen ditaruh di PALING ATAS di dalam <body> -->
@@ -387,9 +385,36 @@ function resetOption() {
   document.getElementById('selected-container')?.classList.add('hidden');
 }
 
-// Menjadikan fungsi seleksi bisa diakses global oleh atribut onclick HTML
+// Fungsi Modal Peringatan
+function showWarningModal() {
+    const modal = document.getElementById('warningModal');
+    const content = document.getElementById('modalContent');
+    if (modal && content) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+}
+
+function closeWarningModal() {
+    const modal = document.getElementById('warningModal');
+    const content = document.getElementById('modalContent');
+    if (modal && content) {
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+}
+
+// Menjadikan fungsi-fungsi bisa diakses secara global via atribut onclick HTML
 window.selectOption = selectOption;
 window.resetOption = resetOption;
+window.showWarningModal = showWarningModal;
+window.closeWarningModal = closeWarningModal;
 
 // ==========================================
 // 3. EVENT LISTENERS
@@ -455,33 +480,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Fungsi untuk menampilkan modal peringatan
-function showWarningModal() {
-    const modal = document.getElementById('warningModal');
-    const content = document.getElementById('modalContent');
-    if (modal && content) {
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-}
-
-// Fungsi untuk menutup modal peringatan
-function closeWarningModal() {
-    const modal = document.getElementById('warningModal');
-    const content = document.getElementById('modalContent');
-    if (modal && content) {
-        content.classList.remove('scale-100', 'opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    }
-}
-
-// Fitur tambahan: Menutup pop-up saat mengklik area di luar kotak (backdrop)
+// Event listener untuk klik area luar (backdrop modal)
 document.getElementById('warningModal')?.addEventListener('click', function(event) {
     if (event.target === this) {
         closeWarningModal();
