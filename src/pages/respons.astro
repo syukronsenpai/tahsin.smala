@@ -112,7 +112,6 @@ import '../styles/global.css';
     const SUPABASE_KEY = "sb_publishable_e99BJ-n7_TyiPQB88uDcwA_N0xjtygX"; 
 
     let supabaseClient;
-    let cachedData = [];
 
     function initSupabase() {
       if (window.supabase) {
@@ -162,7 +161,6 @@ import '../styles/global.css';
           return;
         }
 
-        cachedData = data; // Simpan data ke memori lokal
         const totalItems = data.length;
         if (counterText) counterText.innerText = `${totalItems} Data Masuk`;
 
@@ -188,7 +186,7 @@ import '../styles/global.css';
           const badgeBg = isLulus ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
 
           html += `
-            <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 ${cardBorder} border-y border-r border-slate-100 transition-all">
+            <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 ${cardBorder} border-y border-r border-slate-100 transition-all card-item" data-id="${itemId}">
               <!-- Top Row: Nama & Badge -->
               <div class="flex items-start justify-between gap-2 mb-2">
                 <h2 class="font-bold text-slate-800 text-sm leading-snug">${nama}</h2>
@@ -261,7 +259,7 @@ import '../styles/global.css';
       }
     }
 
-    // Fungsi Utama: Mengirim seluruh isian dari semua kartu ke Supabase sekaligus
+    // Fungsi Utama: Mengambil langsung dari elemen kartu di DOM layar
     async function saveAllData() {
       const btn = document.getElementById('btn-save-all');
       const statusText = document.getElementById('save-status');
@@ -273,23 +271,35 @@ import '../styles/global.css';
       statusText.innerText = "Mengirim data ke database...";
 
       try {
-        // Loop melalui semua data yang ada dan kumpulkan nilai input layarnya
-        for (let item of cachedData) {
-          const id = item.id;
+        // Ambil semua elemen kartu berdasarkan class penanda 'card-item'
+        const cardElements = document.querySelectorAll('.card-item');
+        
+        let updates = [];
+        cardElements.forEach(card => {
+          const id = card.getAttribute('data-id');
           const naikKeInput = document.getElementById(`naik-ke-${id}`);
           const guruNextInput = document.getElementById(`guru-next-${id}`);
 
-          if (naikKeInput && guruNextInput) {
-            const { error } = await supabaseClient
-              .from('hasil_tes')
-              .update({
-                'naik_ke': naikKeInput.value,
-                'guru_berikutnya': guruNextInput.value
-              })
-              .eq('id', id);
-
-            if (error) throw error;
+          if (id && naikKeInput && guruNextInput) {
+            updates.push({
+              id: Number(id),
+              naik_ke: naikKeInput.value,
+              guru_berikutnya: guruNextInput.value
+            });
           }
+        });
+
+        // Kirim pembaruan ke Supabase menggunakan upsert / loop update paralel
+        for (let item of updates) {
+          const { error } = await supabaseClient
+            .from('hasil_tes')
+            .update({
+              'naik_ke': item.naik_ke,
+              'guru_berikutnya': item.guru_berikutnya
+            })
+            .eq('id', item.id);
+
+          if (error) throw error;
         }
 
         btn.className = "w-full bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-md transition-all";
@@ -301,7 +311,7 @@ import '../styles/global.css';
           btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2";
           btn.innerHTML = originalText;
           statusText.innerText = "";
-          toggleSidebar(false); // Tutup sidebar otomatis setelah sukses
+          toggleSidebar(false); 
         }, 1500);
 
       } catch (err) {
@@ -319,7 +329,14 @@ import '../styles/global.css';
           'postgres_changes',
           { event: '*', schema: 'public', table: 'hasil_tes' },
           () => {
-            // Hindari auto-reload saat user sedang mengetik agar inputan tidak ter-reset
+            // Cek apakah pengguna sedang fokus mengetik di dalam input
+            const activeElement = document.activeElement;
+            const isTyping = activeElement && activeElement.tagName === 'INPUT';
+
+            // Hanya lakukan reload data otomatis jika user sedang TIDAK mengetik
+            if (!isTyping) {
+              loadData();
+            }
           }
         )
         .subscribe();
