@@ -17,21 +17,15 @@ import '../styles/global.css';
   <!-- Meta Tag Open Graph untuk WA / Medsos -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Rekap Data Kenaikan Jilid - Tahsin" />
-  <meta property="og:description" content="Ringkasan kenaikan jilid Harian- SMART AULADI." />
+  <meta property="og:description" content="Ringkasan kenaikan jilid Harian - SMART AULADI." />
   
-  <!-- Memanggil gambar thumb.png dari folder public -->
   <meta property="og:image" content="https://tahsin-smala.vercel.app/respons-thumb.png" />
   <meta property="og:image:width" content="630" />
   <meta property="og:image:height" content="630" />
 
-  <!-- Ikon khusus saat dijadikan shortcut di Home Screen HP -->
   <link rel="manifest" href="/manifest-respons.json" />
   <link rel="apple-touch-icon" href="/respon-icon-.svg" />
-
-  <!-- Mengatur warna status bar di Android -->
   <meta name="theme-color" content="#ffffff" />
-
-  <!-- Mengatur status bar di iPhone/iOS agar tetap terlihat -->
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-10">
@@ -64,7 +58,7 @@ import '../styles/global.css';
     </div>
   </header>
 
-  <!-- SIDEBAR / DRAWER KIRI (Smooth Slide-over) -->
+  <!-- SIDEBAR / DRAWER KIRI -->
   <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleSidebar(false)"></div>
   
   <aside id="left-sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-white z-40 shadow-2xl p-5 flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out">
@@ -79,7 +73,7 @@ import '../styles/global.css';
         </button>
       </div>
       <p class="text-xs text-slate-500 leading-relaxed mb-6">
-        Isi seluruh kolom <b>Naik ke</b> dan <b>Guru Berikutnya</b>[cite: 1] pada daftar kartu, lalu tekan tombol di bawah ini untuk menyimpan semuanya sekaligus ke database.
+        Isi seluruh kolom <b>Naik ke</b> dan <b>Guru Berikutnya</b> pada daftar kartu, lalu tekan tombol di bawah ini untuk menyimpan semuanya sekaligus ke database.
       </p>
     </div>
 
@@ -113,6 +107,12 @@ import '../styles/global.css';
 
     let supabaseClient;
 
+    // DAFTAR PILIHAN AUTO-SUGGEST (Sesuai Permintaan, Kapital)
+    const OPSI_NAIK_KE = [
+      "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B",
+      "JUZ 27", "AL-QUR'AN", "GHARIB", "TAJWID", "FINISHING", "TAHFIZ"
+    ];
+
     function initSupabase() {
       if (window.supabase) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -123,7 +123,7 @@ import '../styles/global.css';
       }
     }
 
-    // Fungsi Mengontrol Sidebar (Buka/Tutup halus)
+    // Fungsi Mengontrol Sidebar
     function toggleSidebar(open) {
       const sidebar = document.getElementById('left-sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
@@ -207,19 +207,28 @@ import '../styles/global.css';
                 </div>
               </div>
 
-              <!-- Input Fields: Naik ke & Guru Berikutnya -->
+              <!-- Input Fields dengan Auto-Suggest untuk 'Naik ke' -->
               <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
                 <div class="grid grid-cols-2 gap-2">
-                  <div class="flex flex-col gap-1">
+                  
+                  <!-- Kolom Naik Ke (Relative container untuk dropdown suggest) -->
+                  <div class="flex flex-col gap-1 relative">
                     <label for="naik-ke-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
                     <input 
                       type="text" 
                       id="naik-ke-${itemId}" 
                       value="${naikKe}" 
-                      placeholder="Contoh: 5A"
-                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      placeholder="Contoh: 1B"
+                      autocomplete="off"
+                      oninput="handleAutoSuggest(${itemId}, this.value)"
+                      onfocus="handleAutoSuggest(${itemId}, this.value)"
+                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase"
                     />
+                    <!-- Kotak Dropdown Suggestion -->
+                    <div id="suggest-box-${itemId}" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 hidden max-h-40 overflow-y-auto"></div>
                   </div>
+
+                  <!-- Kolom Guru Berikutnya -->
                   <div class="flex flex-col gap-1">
                     <label for="guru-next-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Guru Berikutnya</label>
                     <input 
@@ -240,7 +249,7 @@ import '../styles/global.css';
                 </div>
               ` : ''}
 
-              <!-- Bottom Row: Nomor Lingkaran & Timestamp -->
+              <!-- Bottom Row -->
               <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400">
                 <span class="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold text-[10px]">
                   ${nomorUrut}
@@ -253,13 +262,72 @@ import '../styles/global.css';
 
         container.innerHTML = html;
 
+        // Tutup suggestion box jika user klik di luar area input
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.relative')) {
+            document.querySelectorAll("[id^='suggest-box-']").forEach(box => box.classList.add('hidden'));
+          }
+        });
+
       } catch (err) {
         container.innerHTML = emptyUI;
         if (counterText) counterText.innerText = "0 Data Masuk";
       }
     }
 
-    // Fungsi Utama: Mengambil langsung dari elemen kartu di DOM layar
+    // --- FITUR AUTO SUGGEST & HIGHLIGHT ---
+    function handleAutoSuggest(id, keyword) {
+      const suggestBox = document.getElementById(`suggest-box-${id}`);
+      if (!suggestBox) return;
+
+      const cleanKeyword = keyword.trim().toUpperCase();
+
+      // Filter daftar pilihan berdasarkan ketikan user (bahkan 1 huruf)
+      const filtered = OPSI_NAIK_KE.filter(item => item.includes(cleanKeyword));
+
+      if (filtered.length === 0 || cleanKeyword === "") {
+        suggestBox.classList.add('hidden');
+        suggestBox.innerHTML = '';
+        return;
+      }
+
+      let listHtml = '';
+      filtered.forEach(option => {
+        // Berikan efek HIGHLIGHT pada huruf yang cocok dengan ketikan user
+        let highlightedText = option;
+        if (cleanKeyword.length > 0) {
+          const regex = new RegExp(`(${cleanKeyword})`, 'gi');
+          highlightedText = option.replace(regex, `<span class="bg-emerald-100 text-emerald-800 font-bold px-0.5 rounded">$1</span>`);
+        }
+
+        listHtml += `
+          <div 
+            onclick="selectSuggestion(${id}, '${option}')"
+            class="px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer border-b border-slate-50 last:border-none transition-colors font-medium"
+          >
+            ${highlightedText}
+          </div>
+        `;
+      });
+
+      suggestBox.innerHTML = listHtml;
+      suggestBox.classList.remove('hidden');
+    }
+
+    // Fungsi saat salah satu saran diklik user
+    function selectSuggestion(id, value) {
+      const inputEl = document.getElementById(`naik-ke-${id}`);
+      const suggestBox = document.getElementById(`suggest-box-${id}`);
+      
+      if (inputEl) {
+        inputEl.value = value;
+      }
+      if (suggestBox) {
+        suggestBox.classList.add('hidden');
+      }
+    }
+
+    // Fungsi Simpan Semua Perubahan ke Database
     async function saveAllData() {
       const btn = document.getElementById('btn-save-all');
       const statusText = document.getElementById('save-status');
@@ -271,10 +339,9 @@ import '../styles/global.css';
       statusText.innerText = "Mengirim data ke database...";
 
       try {
-        // Ambil semua elemen kartu berdasarkan class penanda 'card-item'
         const cardElements = document.querySelectorAll('.card-item');
-        
         let updates = [];
+        
         cardElements.forEach(card => {
           const id = card.getAttribute('data-id');
           const naikKeInput = document.getElementById(`naik-ke-${id}`);
@@ -283,18 +350,17 @@ import '../styles/global.css';
           if (id && naikKeInput && guruNextInput) {
             updates.push({
               id: Number(id),
-              naik_ke: naikKeInput.value,
+              naik_ke: naikKeInput.value.toUpperCase(), // Pastikan tersimpan kapital
               guru_berikutnya: guruNextInput.value
             });
           }
         });
 
-        // Kirim pembaruan ke Supabase menggunakan upsert / loop update paralel
         for (let item of updates) {
           const { error } = await supabaseClient
             .from('hasil_tes')
             .update({
-              'naik_ke': item.naik_ke,
+              'naik_ke': item.nanik_ke || item.naik_ke,
               'guru_berikutnya': item.guru_berikutnya
             })
             .eq('id', item.id);
@@ -329,11 +395,8 @@ import '../styles/global.css';
           'postgres_changes',
           { event: '*', schema: 'public', table: 'hasil_tes' },
           () => {
-            // Cek apakah pengguna sedang fokus mengetik di dalam input
             const activeElement = document.activeElement;
             const isTyping = activeElement && activeElement.tagName === 'INPUT';
-
-            // Hanya lakukan reload data otomatis jika user sedang TIDAK mengetik
             if (!isTyping) {
               loadData();
             }
