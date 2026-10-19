@@ -98,7 +98,7 @@ import '../styles/global.css';
         const { data, error } = await supabaseClient
           .from('hasil_tes')
           .select('*')
-          .order('id', { ascending: true }); // Mengurutkan dari yang paling pertama/lama (1) ke terbaru
+          .order('id', { ascending: true }); // Mengurutkan dari paling pertama/lama ke terbaru
 
         if (error || !data || data.length === 0) {
           container.innerHTML = emptyUI;
@@ -107,15 +107,12 @@ import '../styles/global.css';
         }
 
         const totalItems = data.length;
-
-        // Update jumlah data secara dinamis
-        if (counterText) {
-          counterText.innerText = `${totalItems} Data Masuk`;
-        }
+        if (counterText) counterText.innerText = `${totalItems} Data Masuk`;
 
         let html = '';
         data.forEach((item, index) => {
-          const nomorUrut = index + 1; // Berurut dari 1, 2, 3 ke bawah
+          const nomorUrut = index + 1;
+          const itemId = item.id;
 
           const detailTes = item['Detail Tes'] || '-';
           const isLulus = String(detailTes).toUpperCase() === 'LULUS';
@@ -123,12 +120,15 @@ import '../styles/global.css';
           const nama = item['Nama Proper'] || item['Nama Siswa'] || '-';
           const kelas = item['Kelas'] || '-';
           const jilid = item['Saat Ini'] || '-';
-          const naikKe = item['Naik ke'] || '';
-          const guruBerikutnya = item['Guru Berikutnya'] || '';
+
+          // Membaca nama kolom baru dari Supabase (naik_ke & guru_berikutnya)
+          const naikKe = item['naik_ke'] || item['Naik ke'] || '';
+          const guruBerikutnya = item['guru_berikutnya'] || item['Guru Berikutnya'] || '';
+
           const catatan = item['Catatan'] || null;
           const date = item['Submission Date'] || '-';
 
-          // Dynamic Tailwind Styling untuk Lulus vs Mengulang
+          // Dynamic Styling Lulus vs Mengulang
           const cardBorder = isLulus ? 'border-emerald-500' : 'border-rose-500';
           const badgeBg = isLulus ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
 
@@ -155,27 +155,37 @@ import '../styles/global.css';
               </div>
 
               <!-- Input Fields: Naik ke & Guru Berikutnya -->
-              <div class="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
-                <div class="flex flex-col gap-1">
-                  <label for="naik-ke-${item.id}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
-                  <input 
-                    type="text" 
-                    id="naik-ke-${item.id}" 
-                    value="${naikKe}" 
-                    placeholder="Contoh: 5A"
-                    class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                  />
+              <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                  <div class="flex flex-col gap-1">
+                    <label for="naik-ke-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
+                    <input 
+                      type="text" 
+                      id="naik-ke-${itemId}" 
+                      value="${naikKe}" 
+                      placeholder="Contoh: 5A"
+                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label for="guru-next-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Guru Berikutnya</label>
+                    <input 
+                      type="text" 
+                      id="guru-next-${itemId}" 
+                      value="${guruBerikutnya}" 
+                      placeholder="Nama Guru"
+                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label for="guru-next-${item.id}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Guru Berikutnya</label>
-                  <input 
-                    type="text" 
-                    id="guru-next-${item.id}" 
-                    value="${guruBerikutnya}" 
-                    placeholder="Nama Guru"
-                    class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                  />
-                </div>
+                <!-- Tombol Simpan -->
+                <button 
+                  onclick="saveFieldData('${itemId}')"
+                  id="btn-save-${itemId}"
+                  class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1"
+                >
+                  <span>💾 Simpan Perubahan</span>
+                </button>
               </div>
 
               <!-- Catatan Opsional -->
@@ -201,6 +211,45 @@ import '../styles/global.css';
       } catch (err) {
         container.innerHTML = emptyUI;
         if (counterText) counterText.innerText = "0 Data Masuk";
+      }
+    }
+
+    // Fungsi menyimpan perubahan ke kolom 'naik_ke' dan 'guru_berikutnya' di Supabase
+    async function saveFieldData(id) {
+      const naikKeValue = document.getElementById(`naik-ke-${id}`)?.value || '';
+      const guruNextValue = document.getElementById(`guru-next-${id}`)?.value || '';
+      const btn = document.getElementById(`btn-save-${id}`);
+
+      if (!btn) return;
+
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin">⏳</span> Menyimpan...`;
+
+      try {
+        const { error } = await supabaseClient
+          .from('hasil_tes')
+          .update({
+            'naik_ke': naikKeValue,
+            'guru_berikutnya': guruNextValue
+          })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        btn.className = "w-full bg-slate-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1";
+        btn.innerHTML = `✅ Tersimpan!`;
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1";
+          btn.innerHTML = originalText;
+        }, 2000);
+
+      } catch (err) {
+        alert("Gagal menyimpan data: " + err.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }
     }
 
