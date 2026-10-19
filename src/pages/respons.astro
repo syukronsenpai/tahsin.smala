@@ -37,11 +37,21 @@ import '../styles/global.css';
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-10">
 
   <!-- Sticky Header -->
-  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-sm mb-4">
+  <header class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-sm mb-4">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
+        <!-- Tombol Pemicu Sidebar -->
+        <button 
+          onclick="toggleSidebar(true)" 
+          class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center justify-center"
+          title="Buka Menu Aksi"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
         <span class="text-xl">📋</span>
-        <h1 class="text-base font-bold text-slate-800 tracking-tight">Hasil Tes Kenaikan Jilid</h1>
+        <h1 class="text-base font-bold text-slate-800 tracking-tight">Hasil Tes</h1>
       </div>
       
       <!-- Counter Data Masuk -->
@@ -53,6 +63,38 @@ import '../styles/global.css';
       </div>
     </div>
   </header>
+
+  <!-- SIDEBAR / DRAWER KIRI (Smooth Slide-over) -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleSidebar(false)"></div>
+  
+  <aside id="left-sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-white z-40 shadow-2xl p-5 flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">⚙️</span>
+          <h2 class="font-bold text-slate-800 text-sm">Panel Aksi Guru</h2>
+        </div>
+        <button onclick="toggleSidebar(false)" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600">
+          ✕
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed mb-6">
+        Isi seluruh kolom <b>Naik ke</b> dan <b>Guru Berikutnya</b>[cite: 1] pada daftar kartu, lalu tekan tombol di bawah ini untuk menyimpan semuanya sekaligus ke database.
+      </p>
+    </div>
+
+    <!-- Tombol Simpan Utama di Sidebar -->
+    <div class="space-y-3 pb-4">
+      <button 
+        onclick="saveAllData()"
+        id="btn-save-all"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+      >
+        <span>💾 Simpan Semua Perubahan</span>
+      </button>
+      <p id="save-status" class="text-[11px] text-center text-slate-400 min-h-[16px]"></p>
+    </div>
+  </aside>
 
   <!-- Container Konten -->
   <main class="max-w-md mx-auto px-4">
@@ -70,6 +112,7 @@ import '../styles/global.css';
     const SUPABASE_KEY = "sb_publishable_e99BJ-n7_TyiPQB88uDcwA_N0xjtygX"; 
 
     let supabaseClient;
+    let cachedData = [];
 
     function initSupabase() {
       if (window.supabase) {
@@ -78,6 +121,19 @@ import '../styles/global.css';
         setupRealtime();
       } else {
         setTimeout(initSupabase, 100);
+      }
+    }
+
+    // Fungsi Mengontrol Sidebar (Buka/Tutup halus)
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('left-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
       }
     }
 
@@ -98,7 +154,7 @@ import '../styles/global.css';
         const { data, error } = await supabaseClient
           .from('hasil_tes')
           .select('*')
-          .order('id', { ascending: true }); // Mengurutkan dari paling pertama/lama ke terbaru
+          .order('id', { ascending: true });
 
         if (error || !data || data.length === 0) {
           container.innerHTML = emptyUI;
@@ -106,6 +162,7 @@ import '../styles/global.css';
           return;
         }
 
+        cachedData = data; // Simpan data ke memori lokal
         const totalItems = data.length;
         if (counterText) counterText.innerText = `${totalItems} Data Masuk`;
 
@@ -121,14 +178,12 @@ import '../styles/global.css';
           const kelas = item['Kelas'] || '-';
           const jilid = item['Saat Ini'] || '-';
 
-          // Membaca nama kolom baru dari Supabase (naik_ke & guru_berikutnya)
           const naikKe = item['naik_ke'] || item['Naik ke'] || '';
           const guruBerikutnya = item['guru_berikutnya'] || item['Guru Berikutnya'] || '';
 
           const catatan = item['Catatan'] || null;
           const date = item['Submission Date'] || '-';
 
-          // Dynamic Styling Lulus vs Mengulang
           const cardBorder = isLulus ? 'border-emerald-500' : 'border-rose-500';
           const badgeBg = isLulus ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
 
@@ -156,7 +211,7 @@ import '../styles/global.css';
 
               <!-- Input Fields: Naik ke & Guru Berikutnya -->
               <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
-                <div class="grid grid-cols-2 gap-2 mb-2">
+                <div class="grid grid-cols-2 gap-2">
                   <div class="flex flex-col gap-1">
                     <label for="naik-ke-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
                     <input 
@@ -164,7 +219,7 @@ import '../styles/global.css';
                       id="naik-ke-${itemId}" 
                       value="${naikKe}" 
                       placeholder="Contoh: 5A"
-                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     />
                   </div>
                   <div class="flex flex-col gap-1">
@@ -174,18 +229,10 @@ import '../styles/global.css';
                       id="guru-next-${itemId}" 
                       value="${guruBerikutnya}" 
                       placeholder="Nama Guru"
-                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     />
                   </div>
                 </div>
-                <!-- Tombol Simpan -->
-                <button 
-                  onclick="saveFieldData('${itemId}')"
-                  id="btn-save-${itemId}"
-                  class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1"
-                >
-                  <span>💾 Simpan Perubahan</span>
-                </button>
               </div>
 
               <!-- Catatan Opsional -->
@@ -195,7 +242,7 @@ import '../styles/global.css';
                 </div>
               ` : ''}
 
-              <!-- Bottom Row: Nomor Lingkaran (Kiri) & Timestamp (Kanan) -->
+              <!-- Bottom Row: Nomor Lingkaran & Timestamp -->
               <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400">
                 <span class="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold text-[10px]">
                   ${nomorUrut}
@@ -214,42 +261,54 @@ import '../styles/global.css';
       }
     }
 
-    // Fungsi menyimpan perubahan ke kolom 'naik_ke' dan 'guru_berikutnya' di Supabase
-    async function saveFieldData(id) {
-      const naikKeValue = document.getElementById(`naik-ke-${id}`)?.value || '';
-      const guruNextValue = document.getElementById(`guru-next-${id}`)?.value || '';
-      const btn = document.getElementById(`btn-save-${id}`);
-
+    // Fungsi Utama: Mengirim seluruh isian dari semua kartu ke Supabase sekaligus
+    async function saveAllData() {
+      const btn = document.getElementById('btn-save-all');
+      const statusText = document.getElementById('save-status');
       if (!btn) return;
 
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin">⏳</span> Menyimpan...`;
+      btn.innerHTML = `<span>⏳ Menyimpan Semua...</span>`;
+      statusText.innerText = "Mengirim data ke database...";
 
       try {
-        const { error } = await supabaseClient
-          .from('hasil_tes')
-          .update({
-            'naik_ke': naikKeValue,
-            'guru_berikutnya': guruNextValue
-          })
-          .eq('id', id);
+        // Loop melalui semua data yang ada dan kumpulkan nilai input layarnya
+        for (let item of cachedData) {
+          const id = item.id;
+          const naikKeInput = document.getElementById(`naik-ke-${id}`);
+          const guruNextInput = document.getElementById(`guru-next-${id}`);
 
-        if (error) throw error;
+          if (naikKeInput && guruNextInput) {
+            const { error } = await supabaseClient
+              .from('hasil_tes')
+              .update({
+                'naik_ke': naikKeInput.value,
+                'guru_berikutnya': guruNextInput.value
+              })
+              .eq('id', id);
 
-        btn.className = "w-full bg-slate-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1";
-        btn.innerHTML = `✅ Tersimpan!`;
+            if (error) throw error;
+          }
+        }
+
+        btn.className = "w-full bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-md transition-all";
+        btn.innerHTML = `✅ Berhasil Disimpan!`;
+        statusText.innerText = "Semua perubahan tersimpan permanen.";
 
         setTimeout(() => {
           btn.disabled = false;
-          btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold py-1.5 rounded-md transition-all shadow-sm flex items-center justify-center gap-1";
+          btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2";
           btn.innerHTML = originalText;
-        }, 2000);
+          statusText.innerText = "";
+          toggleSidebar(false); // Tutup sidebar otomatis setelah sukses
+        }, 1500);
 
       } catch (err) {
         alert("Gagal menyimpan data: " + err.message);
         btn.disabled = false;
         btn.innerHTML = originalText;
+        statusText.innerText = "Terjadi kesalahan.";
       }
     }
 
@@ -260,7 +319,7 @@ import '../styles/global.css';
           'postgres_changes',
           { event: '*', schema: 'public', table: 'hasil_tes' },
           () => {
-            loadData();
+            // Hindari auto-reload saat user sedang mengetik agar inputan tidak ter-reset
           }
         )
         .subscribe();
