@@ -107,24 +107,20 @@ import '../styles/global.css';
 
     let supabaseClient;
 
-    // --- DAFTAR PILIHAN NAIK KE (KAPITAL) ---
     const OPSI_NAIK_KE = [
       "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B",
       "JUZ 27", "AL-QUR'AN", "GHARIB", "TAJWID", "FINISHING", "TAHFIZ"
     ];
 
-    // --- DAFTAR SEMUA GURU ---
     const OPSI_GURU = [
       "Vera", "Nining", "Dian", "Nurlaela", "Yani", 
       "Retno", "Tris", "Fahmi", "Yoga", "Syukron"
     ];
 
-    // --- ARRAY KHUSUS GURU PEREMPUAN ---
     const GURU_PEREMPUAN = [
       "Vera", "Nining", "Dian", "Nurlaela", "Yani", "Retno"
     ];
 
-    // Pelacak indeks sorotan keyboard
     let activeSuggestIndex = -1;
 
     function initSupabase() {
@@ -137,7 +133,6 @@ import '../styles/global.css';
       }
     }
 
-    // Fungsi Mengontrol Sidebar
     function toggleSidebar(open) {
       const sidebar = document.getElementById('left-sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
@@ -282,7 +277,6 @@ import '../styles/global.css';
 
         container.innerHTML = html;
 
-        // Listener global untuk menutup semua suggestion box jika diklik di luar input
         document.addEventListener('click', (e) => {
           if (!e.target.closest('.relative')) {
             hideAllSuggestBoxes();
@@ -300,7 +294,6 @@ import '../styles/global.css';
       activeSuggestIndex = -1;
     }
 
-    // --- FITUR AUTO SUGGEST NAIK KE ---
     function handleAutoSuggest(id, keyword) {
       const suggestBox = document.getElementById(`suggest-box-${id}`);
       if (!suggestBox) return;
@@ -344,7 +337,6 @@ import '../styles/global.css';
       hideAllSuggestBoxes();
     }
 
-    // --- FITUR AUTO SUGGEST GURU ---
     function handleAutoSuggestGuru(id, keyword) {
       const suggestBox = document.getElementById(`suggest-box-guru-${id}`);
       if (!suggestBox) return;
@@ -392,15 +384,13 @@ import '../styles/global.css';
       hideAllSuggestBoxes();
     }
 
-    // --- NAVIGASI PANAH LAPTOP & PELEPASAN VALUE DENGAN BACKSPACE ---
     function handleKeyNavigation(e, id, type) {
       const inputEl = e.target;
 
-      // KETIKA BACKSPACE DITEKAN: LANGSUNG KOSONGKAN SELURUH ISI INPUT SEKETIKA
       if (e.key === 'Backspace') {
         if (inputEl.value.length > 0) {
           e.preventDefault();
-          inputEl.value = ''; // Kosongkan langsung
+          inputEl.value = '';
           
           if (type === 'naik-ke') {
             handleAutoSuggest(id, '');
@@ -448,7 +438,6 @@ import '../styles/global.css';
       });
     }
 
-    // --- FUNGSI SIMPAN PERUBAHAN KE DATABASE ---
     async function saveAllData() {
       const btn = document.getElementById('btn-save-all');
       const statusText = document.getElementById('save-status');
@@ -509,16 +498,21 @@ import '../styles/global.css';
       }
     }
 
+    // --- PERBAIKAN REALTIME: PASTIKAN INSERT, UPDATE, DAN DELETE TER-HANDLE DENGAN BAIK ---
     function setupRealtime() {
       supabaseClient
         .channel('realtime-hasil-tes')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'hasil_tes' },
-          () => {
+          (payload) => {
             const activeElement = document.activeElement;
             const isTyping = activeElement && activeElement.tagName === 'INPUT';
-            if (!isTyping) {
+            
+            // Jika ada data masuk baru (INSERT) atau data dihapus (DELETE), 
+            // kita wajib muat ulang agar counter dan kartu langsung sinkron.
+            // Jika hanya UPDATE, jalankan hanya jika user sedang tidak mengetik.
+            if (payload.eventType === 'INSERT' || payload.eventType === 'DELETE' || !isTyping) {
               loadData();
             }
           }
