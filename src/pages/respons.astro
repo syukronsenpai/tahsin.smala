@@ -29,10 +29,10 @@ import '../styles/global.css';
   <link rel="apple-touch-icon" href="/respon-icon-.svg" />
 
   <!-- Mengatur warna status bar di Android -->
-<meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#ffffff" />
 
-<!-- Mengatur status bar di iPhone/iOS agar tetap terlihat -->
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <!-- Mengatur status bar di iPhone/iOS agar tetap terlihat -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-10">
 
@@ -123,6 +123,8 @@ import '../styles/global.css';
           const nama = item['Nama Proper'] || item['Nama Siswa'] || '-';
           const kelas = item['Kelas'] || '-';
           const jilid = item['Saat Ini'] || '-';
+          const naikKe = item['Naik ke'] || '';
+          const guruBerikutnya = item['Guru Berikutnya'] || '';
           const catatan = item['Catatan'] || null;
           const date = item['Submission Date'] || '-';
 
@@ -141,7 +143,7 @@ import '../styles/global.css';
               </div>
 
               <!-- Metadata Row: Kelas & Jilid -->
-              <div class="flex items-center gap-4 text-xs text-slate-500 mb-2">
+              <div class="flex items-center gap-4 text-xs text-slate-500 mb-3">
                 <div class="flex items-center gap-1">
                   <span class="text-slate-400 font-medium">Kelas:</span>
                   <span class="font-semibold text-slate-700">${kelas}</span>
@@ -149,6 +151,30 @@ import '../styles/global.css';
                 <div class="flex items-center gap-1">
                   <span class="text-slate-400 font-medium">Jilid:</span>
                   <span class="font-semibold text-slate-700">${jilid}</span>
+                </div>
+              </div>
+
+              <!-- Input Fields: Naik ke & Guru Berikutnya -->
+              <div class="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
+                <div class="flex flex-col gap-1">
+                  <label for="naik-ke-${item.id}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
+                  <input 
+                    type="text" 
+                    id="naik-ke-${item.id}" 
+                    value="${naikKe}" 
+                    placeholder="Contoh: 5A"
+                    class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label for="guru-next-${item.id}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Guru Berikutnya</label>
+                  <input 
+                    type="text" 
+                    id="guru-next-${item.id}" 
+                    value="${guruBerikutnya}" 
+                    placeholder="Nama Guru"
+                    class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  />
                 </div>
               </div>
 
