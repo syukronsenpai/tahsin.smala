@@ -113,11 +113,19 @@ import '../styles/global.css';
       "JUZ 27", "AL-QUR'AN", "GHARIB", "TAJWID", "FINISHING", "TAHFIZ"
     ];
 
-    // --- DAFTAR PILIHAN GURU BERIKUTNYA ---
+    // --- DAFTAR SEMUA GURU ---
     const OPSI_GURU = [
       "Vera", "Nining", "Dian", "Nurlaela", "Yani", 
       "Retno", "Tris", "Fahmi", "Yoga", "Syukron"
     ];
+
+    // --- ARRAY KHUSUS GURU PEREMPUAN ---
+    const GURU_PEREMPUAN = [
+      "Vera", "Nining", "Dian", "Nurlaela", "Yani", "Retno"
+    ];
+
+    // Pelacak indeks sorotan keyboard
+    let activeSuggestIndex = -1;
 
     function initSupabase() {
       if (window.supabase) {
@@ -217,7 +225,7 @@ import '../styles/global.css';
               <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 mb-2">
                 <div class="grid grid-cols-2 gap-2">
                   
-                  <!-- Kolom Naik Ke dengan Auto-Suggest -->
+                  <!-- Kolom Naik Ke -->
                   <div class="flex flex-col gap-1 relative">
                     <label for="naik-ke-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Naik ke</label>
                     <input 
@@ -227,13 +235,14 @@ import '../styles/global.css';
                       placeholder="Contoh: 1B"
                       autocomplete="off"
                       oninput="handleAutoSuggest(${itemId}, this.value)"
-                      onfocus="this.select(); handleAutoSuggest(${itemId}, this.value)"
+                      onfocus="handleAutoSuggest(${itemId}, this.value)"
+                      onkeydown="handleKeyNavigation(event, ${itemId}, 'naik-ke')"
                       class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase"
                     />
                     <div id="suggest-box-${itemId}" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 hidden max-h-40 overflow-y-auto"></div>
                   </div>
 
-                  <!-- Kolom Guru Berikutnya dengan Auto-Suggest -->
+                  <!-- Kolom Guru Berikutnya -->
                   <div class="flex flex-col gap-1 relative">
                     <label for="guru-next-${itemId}" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Guru Berikutnya</label>
                     <input 
@@ -243,7 +252,8 @@ import '../styles/global.css';
                       placeholder="Nama Guru"
                       autocomplete="off"
                       oninput="handleAutoSuggestGuru(${itemId}, this.value)"
-                      onfocus="this.select(); handleAutoSuggestGuru(${itemId}, this.value)"
+                      onfocus="handleAutoSuggestGuru(${itemId}, this.value)"
+                      onkeydown="handleKeyNavigation(event, ${itemId}, 'guru-next')"
                       class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     />
                     <div id="suggest-box-guru-${itemId}" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 hidden max-h-40 overflow-y-auto"></div>
@@ -275,7 +285,7 @@ import '../styles/global.css';
         // Listener global untuk menutup semua suggestion box jika diklik di luar input
         document.addEventListener('click', (e) => {
           if (!e.target.closest('.relative')) {
-            document.querySelectorAll("[id^='suggest-box-']").forEach(box => box.classList.add('hidden'));
+            hideAllSuggestBoxes();
           }
         });
 
@@ -285,12 +295,18 @@ import '../styles/global.css';
       }
     }
 
+    function hideAllSuggestBoxes() {
+      document.querySelectorAll("[id^='suggest-box-']").forEach(box => box.classList.add('hidden'));
+      activeSuggestIndex = -1;
+    }
+
     // --- FITUR AUTO SUGGEST NAIK KE ---
     function handleAutoSuggest(id, keyword) {
       const suggestBox = document.getElementById(`suggest-box-${id}`);
       if (!suggestBox) return;
 
-      const cleanKeyword = keyword.trim().toUpperCase();
+      activeSuggestIndex = -1;
+      const cleanKeyword = (keyword || '').trim().toUpperCase();
       const filtered = OPSI_NAIK_KE.filter(item => item.includes(cleanKeyword));
 
       if (filtered.length === 0 || cleanKeyword === "") {
@@ -300,7 +316,7 @@ import '../styles/global.css';
       }
 
       let listHtml = '';
-      filtered.forEach(option => {
+      filtered.forEach((option, idx) => {
         let highlightedText = option;
         if (cleanKeyword.length > 0) {
           const regex = new RegExp(`(${cleanKeyword})`, 'gi');
@@ -309,8 +325,9 @@ import '../styles/global.css';
 
         listHtml += `
           <div 
-            onclick="selectSuggestion(${id}, '${option}')"
-            class="px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer border-b border-slate-50 last:border-none transition-colors font-medium"
+            id="suggest-item-${id}-${idx}"
+            onmousedown="selectSuggestion(${id}, '${option}')"
+            class="suggest-item px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer border-b border-slate-50 last:border-none transition-colors font-medium"
           >
             ${highlightedText}
           </div>
@@ -323,9 +340,8 @@ import '../styles/global.css';
 
     function selectSuggestion(id, value) {
       const inputEl = document.getElementById(`naik-ke-${id}`);
-      const suggestBox = document.getElementById(`suggest-box-${id}`);
       if (inputEl) inputEl.value = value;
-      if (suggestBox) suggestBox.classList.add('hidden');
+      hideAllSuggestBoxes();
     }
 
     // --- FITUR AUTO SUGGEST GURU ---
@@ -333,7 +349,8 @@ import '../styles/global.css';
       const suggestBox = document.getElementById(`suggest-box-guru-${id}`);
       if (!suggestBox) return;
 
-      const cleanKeyword = keyword.trim().toLowerCase();
+      activeSuggestIndex = -1;
+      const cleanKeyword = (keyword || '').trim().toLowerCase();
       const filtered = OPSI_GURU.filter(item => item.toLowerCase().includes(cleanKeyword));
 
       if (filtered.length === 0 || cleanKeyword === "") {
@@ -343,7 +360,7 @@ import '../styles/global.css';
       }
 
       let listHtml = '';
-      filtered.forEach(option => {
+      filtered.forEach((option, idx) => {
         let highlightedText = option;
         if (cleanKeyword.length > 0) {
           const regex = new RegExp(`(${cleanKeyword})`, 'gi');
@@ -352,8 +369,9 @@ import '../styles/global.css';
 
         listHtml += `
           <div 
-            onclick="selectSuggestionGuru(${id}, '${option}')"
-            class="px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer border-b border-slate-50 last:border-none transition-colors font-medium"
+            id="suggest-guru-item-${id}-${idx}"
+            onmousedown="selectSuggestionGuru(${id}, '${option}')"
+            class="suggest-item px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer border-b border-slate-50 last:border-none transition-colors font-medium"
           >
             ${highlightedText}
           </div>
@@ -366,12 +384,54 @@ import '../styles/global.css';
 
     function selectSuggestionGuru(id, value) {
       const inputEl = document.getElementById(`guru-next-${id}`);
-      const suggestBox = document.getElementById(`suggest-box-guru-${id}`);
-      if (inputEl) inputEl.value = value;
-      if (suggestBox) suggestBox.classList.add('hidden');
+      if (inputEl) {
+        const isPerempuan = GURU_PEREMPUAN.includes(value);
+        const gelaran = isPerempuan ? "Ustazah " : "Ustaz ";
+        inputEl.value = gelaran + value;
+      }
+      hideAllSuggestBoxes();
     }
 
-    // --- FUNGSI SIMPAN SEMUA PERUBAHAN KE DATABASE ---
+    // --- NAVIGASI PANAH PANAH DI LAPTOP ---
+    function handleKeyNavigation(e, id, type) {
+      const boxId = type === 'naik-ke' ? `suggest-box-${id}` : `suggest-box-guru-${id}`;
+      const suggestBox = document.getElementById(boxId);
+
+      if (!suggestBox || suggestBox.classList.contains('hidden')) return;
+
+      const items = suggestBox.querySelectorAll('.suggest-item');
+      if (items.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeSuggestIndex = (activeSuggestIndex + 1) % items.length;
+        updateActiveSuggestHighlight(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeSuggestIndex = (activeSuggestIndex - 1 + items.length) % items.length;
+        updateActiveSuggestHighlight(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeSuggestIndex >= 0 && items[activeSuggestIndex]) {
+          items[activeSuggestIndex].dispatchEvent(new Event('mousedown'));
+        }
+      } else if (e.key === 'Escape') {
+        hideAllSuggestBoxes();
+      }
+    }
+
+    function updateActiveSuggestHighlight(items) {
+      items.forEach((item, index) => {
+        if (index === activeSuggestIndex) {
+          item.classList.add('bg-emerald-100', 'text-emerald-800');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('bg-emerald-100', 'text-emerald-800');
+        }
+      });
+    }
+
+    // --- FUNGSI SIMPAN PERUBAHAN KE DATABASE ---
     async function saveAllData() {
       const btn = document.getElementById('btn-save-all');
       const statusText = document.getElementById('save-status');
