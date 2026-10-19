@@ -19,16 +19,12 @@ import '../styles/global.css';
   <meta property="og:title" content="Rekap Data Kenaikan Jilid - Tahsin" />
   <meta property="og:description" content="Ringkasan kenaikan jilid Harian - SMART AULADI." />
   
-  <!-- Memanggil gambar thumb.png dari folder public -->
   <meta property="og:image" content="https://tahsin-smala.vercel.app/respons-thumb.png" />
   <meta property="og:image:width" content="630" />
   <meta property="og:image:height" content="630" />
 
-  <!-- Ikon khusus saat dijadikan shortcut di Home Screen HP -->
   <link rel="manifest" href="/manifest-respons.json" />
   <link rel="apple-touch-icon" href="/respon-icon-.svg" />
-
-  <!-- Mengatur warna status bar -->
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 </head>
@@ -62,7 +58,7 @@ import '../styles/global.css';
     </div>
   </header>
 
-  <!-- SIDEBAR / DRAWER KIRI (Smooth Slide-over) -->
+  <!-- SIDEBAR / DRAWER KIRI -->
   <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleSidebar(false)"></div>
   
   <aside id="left-sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-white z-40 shadow-2xl p-5 flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out">
@@ -231,7 +227,7 @@ import '../styles/global.css';
                       placeholder="Contoh: 1B"
                       autocomplete="off"
                       oninput="handleAutoSuggest(${itemId}, this.value)"
-                      onfocus="handleAutoSuggest(${itemId}, this.value)"
+                      onfocus="this.select(); handleAutoSuggest(${itemId}, this.value)"
                       class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase"
                     />
                     <div id="suggest-box-${itemId}" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 hidden max-h-40 overflow-y-auto"></div>
@@ -247,7 +243,7 @@ import '../styles/global.css';
                       placeholder="Nama Guru"
                       autocomplete="off"
                       oninput="handleAutoSuggestGuru(${itemId}, this.value)"
-                      onfocus="handleAutoSuggestGuru(${itemId}, this.value)"
+                      onfocus="this.select(); handleAutoSuggestGuru(${itemId}, this.value)"
                       class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     />
                     <div id="suggest-box-guru-${itemId}" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-30 hidden max-h-40 overflow-y-auto"></div>
