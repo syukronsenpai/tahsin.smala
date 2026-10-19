@@ -73,7 +73,7 @@ import '../styles/global.css';
         </button>
       </div>
       <p class="text-xs text-slate-500 leading-relaxed mb-6">
-        Isi seluruh kolom <b>Naik ke</b> dan <b>Guru Berikutnya</b> pada daftar kartu, lalu tekan tombol di bawah ini untuk menyimpan semuanya sekaligus ke database.
+        Data otomatis tersimpan ke database saat Anda memilih opsi. Anda juga bisa menyimpan massal menggunakan tombol di bawah ini jika diperlukan.
       </p>
     </div>
 
@@ -185,8 +185,8 @@ import '../styles/global.css';
           const kelas = item['Kelas'] || '-';
           const jilid = item['Saat Ini'] || '-';
 
-          const naikKe = item['naik_ke'] || item['Naik ke'] || '';
-          const guruBerikutnya = item['guru_berikutnya'] || item['Guru Berikutnya'] || '';
+          const naikKe = item['naik_ke'] || '';
+          const guruBerikutnya = item['guru_berikutnya'] || '';
 
           const catatan = item['Catatan'] || null;
           const date = item['Submission Date'] || '-';
@@ -331,10 +331,28 @@ import '../styles/global.css';
       suggestBox.classList.remove('hidden');
     }
 
-    function selectSuggestion(id, value) {
+    // --- AUTO-SAVE OTOMATIS SAAT "NAIK KE" DIPILIH ---
+    async function selectSuggestion(id, value) {
       const inputEl = document.getElementById(`naik-ke-${id}`);
-      if (inputEl) inputEl.value = value;
+      if (inputEl) {
+        inputEl.value = value;
+      }
       hideAllSuggestBoxes();
+
+      try {
+        const guruInput = document.getElementById(`guru-next-${id}`);
+        const guruVal = guruInput ? guruInput.value : '';
+
+        await supabaseClient
+          .from('hasil_tes')
+          .update({
+            'naik_ke': value.toUpperCase(),
+            'guru_berikutnya': guruVal
+          })
+          .eq('id', id);
+      } catch (err) {
+        console.error("Gagal auto-save naik_ke:", err.message);
+      }
     }
 
     function handleAutoSuggestGuru(id, keyword) {
@@ -374,14 +392,33 @@ import '../styles/global.css';
       suggestBox.classList.remove('hidden');
     }
 
-    function selectSuggestionGuru(id, value) {
+    // --- AUTO-SAVE OTOMATIS SAAT "GURU BERIKUTNYA" DIPILIH ---
+    async function selectSuggestionGuru(id, value) {
       const inputEl = document.getElementById(`guru-next-${id}`);
+      let finalValue = value;
+      
       if (inputEl) {
         const isPerempuan = GURU_PEREMPUAN.includes(value);
         const gelaran = isPerempuan ? "Ustazah " : "Ustaz ";
-        inputEl.value = gelaran + value;
+        finalValue = gelaran + value;
+        inputEl.value = finalValue;
       }
       hideAllSuggestBoxes();
+
+      try {
+        const naikInput = document.getElementById(`naik-ke-${id}`);
+        const naikVal = naikInput ? naikInput.value.toUpperCase() : '';
+
+        await supabaseClient
+          .from('hasil_tes')
+          .update({
+            'naik_ke': naikVal,
+            'guru_berikutnya': finalValue
+          })
+          .eq('id', id);
+      } catch (err) {
+        console.error("Gagal auto-save guru_berikutnya:", err.message);
+      }
     }
 
     function handleKeyNavigation(e, id, type) {
@@ -498,7 +535,6 @@ import '../styles/global.css';
       }
     }
 
-    // --- PERBAIKAN REALTIME: PASTIKAN INSERT, UPDATE, DAN DELETE TER-HANDLE DENGAN BAIK ---
     function setupRealtime() {
       supabaseClient
         .channel('realtime-hasil-tes')
@@ -509,9 +545,6 @@ import '../styles/global.css';
             const activeElement = document.activeElement;
             const isTyping = activeElement && activeElement.tagName === 'INPUT';
             
-            // Jika ada data masuk baru (INSERT) atau data dihapus (DELETE), 
-            // kita wajib muat ulang agar counter dan kartu langsung sinkron.
-            // Jika hanya UPDATE, jalankan hanya jika user sedang tidak mengetik.
             if (payload.eventType === 'INSERT' || payload.eventType === 'DELETE' || !isTyping) {
               loadData();
             }
